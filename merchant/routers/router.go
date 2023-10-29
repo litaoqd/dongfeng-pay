@@ -41,6 +41,8 @@ func init() {
 	beego.Router("/trade/list/?:params", &controllers.TradeRecord{}, "*:TradeQueryAndListPage")
 	beego.Router("/trade/show_complaint_ui", &controllers.TradeRecord{}, "*:ShowComplaintUI")
 	beego.Router("/trade/complaint/?:params", &controllers.TradeRecord{}, "*:ComplaintQueryAndListPage")
+	
+	beego.Router("/query_order/ui", &controllers.QueryOrderController{}, "*:ShowUI")
 
 	beego.Router("/user_info/show_modify_ui", &controllers.UserInfo{}, "*:ShowModifyUserInfoUI")
 	beego.Router("/user_info/modify_userInfo/?:params", &controllers.UserInfo{}, "*:ModifyUserInfo")
