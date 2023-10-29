@@ -2,6 +2,48 @@
 <html>
 <head>
     {{template "template/css.html"}}
+<style>
+    .order-details {
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-top: 20px;
+        font-family: 'Arial', sans-serif;
+    }
+    .order-details table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .order-details th, .order-details td {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+    }
+    .order-details th {
+        color: #333;
+        font-weight: bold;
+    }
+    .order-details td {
+        color: #555;
+    }
+    .order-not-found {
+        color: #d9534f;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+    }
+    #merchantOrderId {
+        max-width: 300px; /* 调整搜索框的长度 */
+        display: inline-block; /* 使搜索框适应指定的宽度 */
+    }
+    .search-container {
+        margin-bottom: 20px;
+    }    
+</style>
+
+
 </head>
 <body>
 <div class="page">
@@ -63,7 +105,7 @@
             <!-- Page Header-->
             <header class="page-header">
                 <div class="container-fluid">
-                    <h2 class="no-margin-bottom">查询订单</h2>
+                    <h2 class="no-margin-bottom">查询订单 - 请输入商户订单号，点击搜索查询</h2>
                 </div>
             </header>
             <!-- Forms Section-->
@@ -72,10 +114,10 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card">
-                                <div class="card-header d-flex align-items-center">
-                                    <input type="text" id="merchantOrderId" placeholder="商户订单号" class="form-control mr-3">
-                                    <button onclick="searchOrder()" class="btn btn-primary">搜索</button>
-                                </div>
+                            <div class="card-header d-flex align-items-center search-container">
+                                <input type="text" id="merchantOrderId" placeholder="商户订单号" class="form-control mr-3" onkeypress="handleKeyPress(event)">
+                                <button onclick="searchOrder()" class="btn btn-primary">搜索</button>
+                            </div>
                                 <div class="card-body">
                                     <div id="orderResult"></div>
                                 </div>
@@ -97,19 +139,63 @@ function searchOrder() {
         return;
     }
 
-    // 使用相对路径指向同一目录下的 PHP 文件
-    var apiUrl = './queryOrder.php?merchantOrderId=' + merchantOrderId;
+    var apiUrl = '/query_order/search?merchantOrderId=' + merchantOrderId;
 
     fetch(apiUrl)
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
-        // 在这里处理返回的订单数据
-        // ...
+        displayOrderData(data);
     })
     .catch(error => {
         console.error('Error:', error);
+        document.getElementById('orderResult').innerHTML = '<p class="order-not-found">未找到订单</p>';
     });
 }
+
+
+function displayOrderData(orderData) {
+    // 检查是否存在订单号
+    if (!orderData.ref_trade_id) {
+        document.getElementById('orderResult').innerHTML = '<p class="order-not-found">未找到订单</p>';
+        return;
+    }
+
+    // 检查 customer 字段是否存在并且包含所需的属性
+    var customerName = '未知';
+    if (orderData.customer && 'first_name' in orderData.customer && 'last_name' in orderData.customer) {
+        customerName = orderData.customer.first_name + ' ' + orderData.customer.last_name;
+    }
+
+    // 构建订单详情的 HTML 结构
+    var orderDetails = `
+        <div class="order-details">
+            <table>
+                <tr><th>订单号 (Order ID):</th><td>${orderData.ref_trade_id}</td></tr>
+                <tr><th>金额 (Amount):</th><td>${orderData.amount} ${orderData.currency}</td></tr>
+                <tr><th>手续费 (Fee):</th><td>${orderData.fee_amount}</td></tr>
+                <tr><th>状态 (Status):</th><td>${orderData.status}</td></tr>
+                <tr><th>客户姓名 (Customer Name):</th><td>${customerName}</td></tr>
+                <tr><th>交易时间 (Transaction Time):</th><td>${new Date(parseInt(orderData.trans_at)).toLocaleString()}</td></tr>
+                <tr><th>描述 (Description):</th><td>${orderData.description}</td></tr>
+            </table>
+        </div>
+    `;
+
+    // 将构建的 HTML 显示在页面上
+    document.getElementById('orderResult').innerHTML = orderDetails;
+}
+
+function handleKeyPress(event) {
+    if (event.keyCode === 13) { // 13 是回车键的键码
+        searchOrder();
+    }
+}
+
 </script>
 </body>
 </html>

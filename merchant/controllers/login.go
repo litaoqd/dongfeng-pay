@@ -1,106 +1,121 @@
-/***************************************************
- ** @Desc : This file for 用户登录
- ** @Time : 19.11.29 13:52
- ** @Author : Joker
- ** @File : login
- ** @Last Modified by : Joker
- ** @Last Modified time: 19.11.29 13:52
- ** @Software: GoLand
-****************************************************/
 package controllers
 
 import (
-	"fmt"
-	beego "github.com/beego/beego/v2/server/web"
-	"github.com/dchest/captcha"
-	"merchant/models"
-	"merchant/sys"
-	"merchant/sys/enum"
-	"merchant/utils"
-	"strconv"
-	"strings"
+    "fmt"
+    "github.com/beego/beego/v2/server/web"
+    "github.com/dchest/captcha"
+    "merchant/models"
+    "merchant/sys"
+    "merchant/sys/enum"
+    "merchant/utils"
+    "strings"
+    "github.com/dgryski/dgoogauth"
 )
 
 var pubMethod = sys.PublicMethod{}
 var encrypt = utils.Encrypt{}
 
 type Login struct {
-	beego.Controller
+    web.Controller
 }
 
 func (c *Login) UserLogin() {
-	captchaCode := c.GetString("captchaCode")
-	captchaId := c.GetString("captchaId")
-	userName := strings.TrimSpace(c.GetString("userName"))
-	password := c.GetString("Password")
+    // captchaCode := c.GetString("captchaCode")
+    // captchaId := c.GetString("captchaId")
+    userName := strings.TrimSpace(c.GetString("userName"))
+    password := c.GetString("Password")
+    dynamicCode := c.GetString("dynamicCode")
 
-	var (
-		flag = enum.FailedFlag
-		msg  = ""
-		url  = "/"
+    var (
+        flag = enum.FailedFlag
+        msg  = ""
+        url  = "/"
 
-		pwdMd5 string
-		ran    string
-		ranMd5 string
+        pwdMd5 string
+        ran    string
+        ranMd5 string
 
-		verify bool
-		u      models.MerchantInfo
-	)
+        // verify bool
+        u      models.MerchantInfo
+    )
 
-	us := c.GetSession(enum.UserSession)
-	if us != nil {
-		url = enum.DoMainUrl
-		flag = enum.SuccessFlag
-		goto stopRun
-	}
+    us := c.GetSession(enum.UserSession)
+    if us != nil {
+        url = enum.DoMainUrl
+        flag = enum.SuccessFlag
+        c.respondAndExit(flag, msg, url)
+        return
+    }
 
-	if userName == "" || password == "" {
-		msg = "登录账号或密码不能为空!"
-		goto stopRun
-	}
+    if userName == "" || password == "" {
+        msg = "登录账号或密码不能为空!"
+        c.respondAndExit(enum.FailedFlag, msg, "/")
+        return
+    }
 
-	verify = captcha.VerifyString(captchaId, captchaCode)
-	if !verify {
-		url = strconv.Itoa(enum.FailedFlag)
-		msg = "验证码不正确!"
-		goto stopRun
-	}
 
-	u = models.GetMerchantByPhone(userName)
-	if u.LoginPassword == "" {
-		msg = "账户信息错误，请联系管理人员!"
-		goto stopRun
-	}
+    u = models.GetMerchantByPhone(userName)
+    if u.LoginPassword == "" {
+        msg = "账户信息错误，请联系管理人员!"
+        c.respondAndExit(enum.FailedFlag, msg, "/")
+        return
+    }
 
-	if strings.Compare(enum.ACTIVE, u.Status) != 0 {
-		msg = "登录账号或密码错误!"
-		goto stopRun
-	}
+    if strings.Compare(enum.ACTIVE, u.Status) != 0 {
+        msg = "登录账号或密码错误!"
+        c.respondAndExit(enum.FailedFlag, msg, "/")
+        return
+    }
 
-	//验证密码
-	pwdMd5 = encrypt.EncodeMd5([]byte(password))
-	if strings.Compare(strings.ToUpper(pwdMd5), u.LoginPassword) != 0 {
-		msg = "登录账号或密码错误!"
-		goto stopRun
-	}
+    // 验证密码
+    pwdMd5 = encrypt.EncodeMd5([]byte(password))
+    if strings.Compare(strings.ToUpper(pwdMd5), u.LoginPassword) != 0 {
+        msg = "登录账号或密码错误!"
+        c.respondAndExit(enum.FailedFlag, msg, "/")
+        return
+    }
 
-	c.SetSession(enum.UserSession, u)
+    // 验证 Google Authenticator OTP
+    otpConfig := &dgoogauth.OTPConfig{
+        Secret:      u.MerchantSecret,
+        WindowSize:  3,
+        HotpCounter: 0,
+    }
+    
+    fmt.Println("Merchant Key:", otpConfig.Secret)
+    fmt.Println("dynamicCode:", dynamicCode)    
+    valid, err := otpConfig.Authenticate(dynamicCode)
+    if err != nil || !valid {
+        msg = "动态验证码错误或已过期!"
+        c.respondAndExit(enum.FailedFlag, msg, "/")
+        return
+    }
 
-	// 设置客户端用户信息有效保存时间
-	ran = pubMethod.RandomString(46)
-	ranMd5 = encrypt.EncodeMd5([]byte(ran))
-	c.Ctx.SetSecureCookie(ranMd5, enum.UserCookie, ranMd5, enum.CookieExpireTime)
-	c.SetSession(enum.UserCookie, ranMd5)
+    c.SetSession(enum.UserSession, u)
 
-	url = enum.DoMainUrl
-	flag = enum.SuccessFlag
-	utils.LogNotice(fmt.Sprintf("【%s】用户登录成功，请求IP：%s", u.MerchantName, c.Ctx.Input.IP()))
+    // 设置客户端用户信息有效保存时间
+    ran = pubMethod.RandomString(46)
+    ranMd5 = encrypt.EncodeMd5([]byte(ran))
+    c.Ctx.SetSecureCookie(ranMd5, enum.UserCookie, ranMd5, enum.CookieExpireTime)
+    c.SetSession(enum.UserCookie, ranMd5)
 
-stopRun:
-	c.Data["json"] = pubMethod.JsonFormat(flag, "", msg, url)
-	_ = c.ServeJSON()
-	c.StopRun()
+    url = enum.DoMainUrl
+    flag = enum.SuccessFlag
+    utils.LogNotice(fmt.Sprintf("&#8203;``【oaicite:0】``&#8203;用户登录成功，请求IP：%s", u.MerchantName, c.Ctx.Input.IP()))
+
+    c.respondAndExit(flag, msg, url)
 }
+
+func (c *Login) respondAndExit(flag int, msg string, url string) {
+    c.Data["json"] = pubMethod.JsonFormat(flag, "", msg, url)
+    _ = c.ServeJSON()
+    c.StopRun()
+}
+
+// 这里添加您项目中其他已有的方法
+// 例如：Logout, ChangePassword, ResetPassword 等
+// 确保这些方法与您项目的其他部分保持一致
+
 
 func (c *Login) Index() {
 	capt := struct {
