@@ -971,6 +971,7 @@ section.dashboard-counts .number {
 
 section.dashboard-counts .number strong {
   font-weight: 700;
+  text-align: right;
 }
 
 section.dashboard-counts .row {
