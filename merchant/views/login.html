@@ -70,6 +70,10 @@
                                          title="点击更换验证码" onclick="login.changeImg();">
                                     <input value="{{.CaptchaId}}" id="captchaId" name="captchaId" type="hidden"/>
                                 </div>
+                                <div class="form-group">
+                                    <input id="dynamicCode" type="text" name="dynamicCode" required
+                                    data-msg="Google动态验证码" class="input-material" placeholder="动态验证码">
+                                </div>
                                 <br><br><br>
                                 <button type="button" style="top: 12px;" class="btn btn-primary btn-user btn-block"
                                         id="btn_submit"
