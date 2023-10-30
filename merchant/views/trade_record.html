@@ -1,236 +1,293 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     {{template "template/css.html"}}
     <style>
         .trade-record-details table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    font-family: 'Arial', sans-serif;
-}
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-family: 'Arial', sans-serif;
+        }
 
-.trade-record-details th, .trade-record-details td {
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-}
+        .trade-record-details th,
+        .trade-record-details td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
 
-.trade-record-details th {
-    background-color: #f2f2f2;
-    color: #333;
-    font-weight: bold;
-    white-space: nowrap;
-}
+        .trade-record-details th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+            white-space: nowrap;
+        }
 
-.trade-record-details td {
-    color: #555;
-}
-    .status-input {
-        width: 120px; /* 调整状态选择框的宽度 */
-    }
+        .trade-record-details td {
+            color: #555;
+        }
+
+        .status-input {
+            width: 120px;
+            /* 调整状态选择框的宽度 */
+        }
+
         .date-input {
-        width: 150px; /* 调整日期输入框的宽度 */
-    }
+            width: 150px;
+            /* 调整日期输入框的宽度 */
+        }
 
-    .status-input {
-        width: 120px; /* 调整状态选择框的宽度 */
-    }
-    
-    .start-time-label {
-        margin-right: 10px; /* 调整标签和输入框之间的间隔 */
-    }
-    .datetime-input {
-        width: 180px; /* 设置日期时间输入框的宽度 */
-    }
+        .status-input {
+            width: 120px;
+            /* 调整状态选择框的宽度 */
+        }
 
+        .start-time-label {
+            margin-right: 10px;
+            /* 调整标签和输入框之间的间隔 */
+        }
+
+        .datetime-input {
+            width: 180px;
+            /* 设置日期时间输入框的宽度 */
+        }
     </style>
-    
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
-
-
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
 </head>
 
 <body>
-<div class="page">
-    <!-- Main Navbar-->
-    {{template "template/header.html"}}
-    <div class="page-content d-flex align-items-stretch">
-        <!-- Side Navbar -->
-        <nav class="side-navbar">
-            <!-- Sidebar Header-->
-            <div class="sidebar-header d-flex align-items-center">
-                <a href="/index/ui/">
-                    <div class="avatar">
-                        <img src="../../static/img/avatar-1.jpg" alt="..."
-                             class="img-fluid rounded-circle">
-                    </div>
-                </a>
-                <a href="#">
-                    <div class="title">
-                        <h1 class="h4">{{.userName}}</h1>
-                        <p>欢迎您！</p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Sidebar Navidation Menus--><span class="heading">主菜单</span>
-            <ul class="list-unstyled">
-                <li><a href="/index/ui/"> <i class="icon-home"></i>首页 </a></li>
-                <li>
-                    <a href="#exampledropdownDropdown" aria-expanded="false" data-toggle="collapse"> <i
-                                class="icon icon-user"></i>账户管理 </a>
-                    <ul id="exampledropdownDropdown" class="collapse list-unstyled ">
-                        <li><a href="/user_info/show_modify_ui">修改密码</a></li>
-                        <li><a href="/user_info/show_ui">账户资料</a></li>
-                        <li><a href="/index/show_pay_way_ui">通道配置</a></li>
-                    </ul>
-                </li>
-                <li><a href="#exampledropdownDropdown1" aria-expanded="true" data-toggle="collapse"> <i
-                                class="icon icon-presentation"></i>订单管理 </a>
-                    <ul id="exampledropdownDropdown1" class=" list-unstyled ">
-                        <li><a href="/query_order/ui">查询订单</a></li>
-                        <li class="active"><a href="/trade/show_ui">订单记录</a></li>
-                        <li><a href="/trade/show_complaint_ui">投诉列表</a></li>
-
-                    </ul>
-                </li>
-                <li><a href="#exampledropdownDropdown2" aria-expanded="false" data-toggle="collapse"> <i
-                                class="icon icon-bill"></i>财务管理 </a>
-                    <ul id="exampledropdownDropdown2" class="collapse list-unstyled ">
-                        <li><a href="/withdraw/show_ui">申请提现</a></li>
-                        <li><a href="/multi_withdraw/show_multi_ui">批量申请提现</a></li>
-                        <li><a href="/withdraw/show_list_ui">提现记录</a></li>
-                        {{/*                        <li><a href="/recharge/show_recharge_list_ui">自定义记录</a></li>*/}}
-                        <li><a href="/history/show_history_list_ui">资产变动明细</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-        <div class="content-inner">
-            <!-- Page Header-->
-            <header class="page-header">
-                <div class="container-fluid">
-                    <h2 class="no-margin-bottom">交易记录 - 请输入搜索条件，点击搜索查询</h2>
+    <div class="page">
+        <!-- Main Navbar-->
+        {{template "template/header.html"}}
+        <div class="page-content d-flex align-items-stretch">
+            <!-- Side Navbar -->
+            <nav class="side-navbar">
+                <!-- Sidebar Header-->
+                <div class="sidebar-header d-flex align-items-center">
+                    <a href="/index/ui/">
+                        <div class="avatar">
+                            <img src="../../static/img/avatar-1.jpg" alt="..." class="img-fluid rounded-circle">
+                        </div>
+                    </a>
+                    <a href="#">
+                        <div class="title">
+                            <h1 class="h4">{{.userName}}</h1>
+                            <p>欢迎您！</p>
+                        </div>
+                    </a>
                 </div>
-            </header>
-            <!-- Forms Section-->
-            <section class="forms">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="card">
-                                <div class="card-header d-flex align-items-center search-container">
-<div class="d-flex align-items-center search-container">
-    <label class="start-time-label" for="datetimeStart">开始时间: </label>
-    <input type="text" id="datetimeStart" class="form-control mr-3 datetime-input" placeholder="开始时间">
-
-    <label class="start-time-label" for="datetimeEnd">结束时间: </label>
-    <input type="text" id="datetimeEnd" class="form-control mr-3 datetime-input" placeholder="结束时间">
-
-    <!-- ... 其他元素 ... -->
-</div>
-    <select class="form-control mr-3 status-input" id="status">
-                                        <option value="">全部状态</option>
-                                        <option value="processing">处理中</option>
-                                        <option value="succeeded">交易成功</option>
-                                         <option value="failed">交易失败</option>
-                                        <option value="accounted">已入帐</option>
-                                        
-                                        <!-- ... 其他状态 ... -->
-                                    </select>
-                                    <button onclick="fetchTradeRecords()" class="btn btn-primary">搜索</button>
-                                </div>
-                                <div class="card-body">
-                                    <div id="tradeRecordResult"></div>
+                <!-- Sidebar Navidation Menus-->
+                <span class="heading">主菜单</span>
+                <ul class="list-unstyled">
+                    <li>
+                        <a href="/index/ui/">
+                            <i class="icon-home"></i>
+                            首页
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#exampledropdownDropdown" aria-expanded="false" data-toggle="collapse">
+                            <i class="icon icon-user"></i>
+                            账户管理
+                        </a>
+                        <ul id="exampledropdownDropdown" class="collapse list-unstyled ">
+                            <li>
+                                <a href="/user_info/show_modify_ui">修改密码</a>
+                            </li>
+                            <li>
+                                <a href="/user_info/show_ui">账户资料</a>
+                            </li>
+                            <li>
+                                <a href="/index/show_pay_way_ui">通道配置</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#exampledropdownDropdown1" aria-expanded="true" data-toggle="collapse">
+                            <i class="icon icon-presentation"></i>
+                            订单管理
+                        </a>
+                        <ul id="exampledropdownDropdown1" class=" list-unstyled ">
+                            <li>
+                                <a href="/query_order/ui">查询订单</a>
+                            </li>
+                            <li class="active">
+                                <a href="/trade/show_ui">订单记录</a>
+                            </li>
+                            <li>
+                                <a href="/trade/show_complaint_ui">投诉列表</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#exampledropdownDropdown2" aria-expanded="false" data-toggle="collapse">
+                            <i class="icon icon-bill"></i>
+                            财务管理
+                        </a>
+                        <ul id="exampledropdownDropdown2" class="collapse list-unstyled ">
+                            <li>
+                                <a href="/withdraw/show_ui">申请提现</a>
+                            </li>
+                            <li>
+                                <a href="/multi_withdraw/show_multi_ui">批量申请提现</a>
+                            </li>
+                            <li>
+                                <a href="/withdraw/show_list_ui">提现记录</a>
+                            </li>
+                            {{/*
+                            <li>
+                                <a href="/recharge/show_recharge_list_ui">自定义记录</a>
+                            </li>
+                            */}}
+                            <li>
+                                <a href="/history/show_history_list_ui">资产变动明细</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="content-inner">
+                <!-- Page Header-->
+                <header class="page-header">
+                    <div class="container-fluid">
+                        <h2 class="no-margin-bottom">交易记录 - 请输入搜索条件，点击搜索查询</h2>
+                    </div>
+                </header>
+                <!-- Forms Section-->
+                <section class="forms">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-header d-flex align-items-center search-container">
+                                        <div class="d-flex align-items-center search-container">
+                                            <label class="start-time-label" for="datetimeStart">开始时间:</label>
+                                            <input type="text" id="datetimeStart"
+                                                class="form-control mr-3 datetime-input" placeholder="开始时间">
+                                            <label class="start-time-label" for="datetimeEnd">结束时间:</label>
+                                            <input type="text" id="datetimeEnd" class="form-control mr-3 datetime-input"
+                                                placeholder="结束时间">
+                                            <!-- ... 其他元素 ... -->
+                                        </div>
+                                        <select class="form-control mr-3 status-input" id="status">
+                                            <option value="">全部状态</option>
+                                            <option value="processing">处理中</option>
+                                            <option value="succeeded">交易成功</option>
+                                            <option value="failed">交易失败</option>
+                                            <option value="accounted">已入帐</option>
+                                            <!-- ... 其他状态 ... -->
+                                        </select>
+                                        <button onclick="fetchTradeRecords()" class="btn btn-primary">搜索</button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="tradeRecordResult"></div>
+                                    </div>
+                                    <div class="pagination-buttons">
+                                        <button id="prevPageButton" onclick="fetchPreviousPage()">上一页</button>
+                                        <button id="nextPageButton" onclick="fetchNextPage()">下一页</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
     </div>
-</div>
-<!-- JavaScript files-->
-{{template "template/js.html"}}
-<!-- 在其他 JavaScript 文件之前添加 jQuery 和 jQuery UI 的脚本 -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+    <!-- JavaScript files-->
+    {{template "template/js.html"}}
+    <!-- 在其他 JavaScript 文件之前添加 jQuery 和 jQuery UI 的脚本 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+    <script>
+        // $(document).ready(function(){
+        //     $('.datepicker').datepicker({
+        //         format: 'yyyy-mm-dd',
+        //         autoclose: true
+        //     });
+        // });
+        var paginationInfo = {
+            startAfter: '',
+            endBefore: ''
+        };
+        $(document).ready(function () {
+            var currentDate = new Date();
+            var defaultStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), currentDate.getHours(), currentDate.getMinutes(), 0);
+            var defaultEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), currentDate.getHours(), currentDate.getMinutes(), 0);
 
-<script>
-// $(document).ready(function(){
-//     $('.datepicker').datepicker({
-//         format: 'yyyy-mm-dd',
-//         autoclose: true
-//     });
-// });
-$(document).ready(function(){
-    var currentDate = new Date();
-    var defaultStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), currentDate.getHours(), currentDate.getMinutes(), 0);
-    var defaultEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), currentDate.getHours(), currentDate.getMinutes(), 0);
+            $('#datetimeStart').datetimepicker({
+                format: 'Y-m-d H:i:s',
+                defaultDate: defaultStart,
+                step: 15, // 设置时间间隔为15分钟
+                onShow: function (ct) {
+                    this.setOptions({
+                        maxDate: $('#datetimeEnd').val() ? $('#datetimeEnd').val() : false
+                    })
+                },
+                timepicker: true
+            });
 
-    $('#datetimeStart').datetimepicker({
-        format: 'Y-m-d H:i:s',
-        defaultDate: defaultStart,
-        step: 15, // 设置时间间隔为15分钟
-        onShow: function(ct) {
-            this.setOptions({
-                maxDate: $('#datetimeEnd').val() ? $('#datetimeEnd').val() : false
-            })
-        },
-        timepicker: true
-    });
+            $('#datetimeEnd').datetimepicker({
+                format: 'Y-m-d H:i:s',
+                defaultDate: defaultEnd,
+                step: 15, // 设置时间间隔为15分钟
+                onShow: function (ct) {
+                    this.setOptions({
+                        minDate: $('#datetimeStart').val() ? $('#datetimeStart').val() : false
+                    })
+                },
+                timepicker: true
+            });
+        });
 
-    $('#datetimeEnd').datetimepicker({
-        format: 'Y-m-d H:i:s',
-        defaultDate: defaultEnd,
-        step: 15, // 设置时间间隔为15分钟
-        onShow: function(ct) {
-            this.setOptions({
-                minDate: $('#datetimeStart').val() ? $('#datetimeStart').val() : false
-            })
-        },
-        timepicker: true
-    });
-});
+        function fetchTradeRecords(startAfter = '', endBefore = '') {
+            var start = $('#datetimeStart').val();
+            var end = $('#datetimeEnd').val();
+            var status = $('#status').val();
+            // var pageSize = 2; // 根据需要调整
+            // var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}&page_size=${pageSize}&start_after=${startAfter}&end_before=${endBefore}`;
+            var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}&start_after=${startAfter}&end_before=${endBefore}`;
+            // var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}`;
 
-function fetchTradeRecords() {
-    var start = $('#datetimeStart').val();
-    var end = $('#datetimeEnd').val();
-    var status = $('#status').val();
-    var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}`;
-
-    fetch(apiUrl)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayTradeRecordData(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('tradeRecordResult').innerHTML = '<p class="trade-record-not-found">未找到交易记录</p>';
+                });
         }
-        return response.json();
-    })
-    .then(data => {
-        displayTradeRecordData(data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('tradeRecordResult').innerHTML = '<p class="trade-record-not-found">未找到交易记录</p>';
-    });
-}
 
-function displayTradeRecordData(tradeRecordData) {
-    // 检查是否存在交易记录
-    if (!tradeRecordData || tradeRecordData.data.length === 0) {
-        document.getElementById('tradeRecordResult').innerHTML = '<p class="trade-record-not-found">未找到交易记录</p>';
-        return;
-    }
+        function displayTradeRecordData(tradeRecordData) {
+            // 检查是否存在交易记录
+            if (!tradeRecordData || tradeRecordData.data.length === 0) {
+                document.getElementById('tradeRecordResult').innerHTML = '<p class="trade-record-not-found">未找到交易记录</p>';
+                return;
+            }
 
-    // 构建交易记录详情的 HTML 结构
-    var tradeRecordDetails = '<div class="trade-record-details"><table>';
-    tradeRecordDetails += '<tr><th>商户交易 ID<br>(Merchant Trade ID)</th><th>金额<br>(Amount)</th><th>银行账户名<br>(Bank Account Name)</th><th>银行账号<br>(Bank Account No)</th><th>交易时间<br>(Transaction Time)</th><th>状态<br>(Status)</th></tr>';
-    tradeRecordData.data.forEach(function(item) {
-        var transTime = new Date(parseInt(item.trans_at)).toLocaleString();
-        tradeRecordDetails += `<tr>
+            if (tradeRecordData.has_more) {
+                paginationInfo.startAfter = tradeRecordData.start_after;
+                paginationInfo.endBefore = tradeRecordData.end_before;
+            }
+
+            // 构建交易记录详情的 HTML 结构
+            var tradeRecordDetails = '<div class="trade-record-details"><table>';
+            tradeRecordDetails += '<tr><th>商户交易 ID<br>(Merchant Trade ID)</th><th>金额<br>(Amount)</th><th>银行账户名<br>(Bank Account Name)</th><th>银行账号<br>(Bank Account No)</th><th>交易时间<br>(Transaction Time)</th><th>状态<br>(Status)</th></tr>';
+            tradeRecordData.data.forEach(function (item) {
+                var transTime = new Date(parseInt(item.trans_at)).toLocaleString();
+                tradeRecordDetails += `<tr>
             <td>${item.ref_trade_id}</td>
             <td>${item.amount} ${item.currency}</td>
             <td>${item.bank_account_name}</td>
@@ -238,13 +295,22 @@ function displayTradeRecordData(tradeRecordData) {
             <td>${transTime}</td>
             <td>${item.status}</td>
         </tr>`;
-    });
-    tradeRecordDetails += '</table></div>';
+            });
+            tradeRecordDetails += '</table></div>';
 
-    // 将构建的 HTML 显示在页面上
-    document.getElementById('tradeRecordResult').innerHTML = tradeRecordDetails;
-}
+            // 将构建的 HTML 显示在页面上
+            document.getElementById('tradeRecordResult').innerHTML = tradeRecordDetails;
+        }
 
-</script>
+
+        function fetchNextPage() {
+            fetchTradeRecords(paginationInfo.startAfter, '');
+        }
+
+        function fetchPreviousPage() {
+            fetchTradeRecords('', paginationInfo.endBefore);
+        }
+    </script>
 </body>
+
 </html>

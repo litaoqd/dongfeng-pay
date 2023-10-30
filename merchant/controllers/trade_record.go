@@ -10,12 +10,12 @@
 package controllers
 
 import (
-    "encoding/json"
-    "fmt"
-    "net/http"
-    "merchant/models" // 确保导入正确的路径
-    "github.com/beego/beego/v2/server/web"
-    "merchant/sys/enum"
+	"encoding/json"
+	"fmt"
+	"github.com/beego/beego/v2/server/web"
+	"merchant/models" // 确保导入正确的路径
+	"merchant/sys/enum"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -42,70 +42,74 @@ func (c *TradeRecord) ShowUI() {
 
 // TradeQueryAndListPage 方法的修改
 func (c *TradeRecord) TradeQueryAndListPage() {
-    us := c.GetSession(enum.UserSession)
-    u := us.(models.MerchantInfo)
+	us := c.GetSession(enum.UserSession)
+	u := us.(models.MerchantInfo)
 
-    // 分页参数
-    page, _ := strconv.Atoi(c.GetString("page"))
-    limit, _ := strconv.Atoi(c.GetString("limit"))
-    if limit == 0 {
-        limit = 15
-    }
+	// 分页参数
+	page, _ := strconv.Atoi(c.GetString("page"))
+	limit, _ := strconv.Atoi(c.GetString("limit"))
+	if limit == 0 {
+		limit = 15
+	}
 
-    // 查询参数
-    in := make(map[string]string)
-    merchantNo := strings.TrimSpace(c.GetString("MerchantNo"))
-    start := strings.TrimSpace(c.GetString("start"))
-    end := strings.TrimSpace(c.GetString("end"))
-    payType := strings.TrimSpace(c.GetString("pay_type"))
-    status := strings.TrimSpace(c.GetString("status"))
+	// 查询参数
+	in := make(map[string]string)
+	merchantNo := strings.TrimSpace(c.GetString("MerchantNo"))
+	start := strings.TrimSpace(c.GetString("start"))
+	end := strings.TrimSpace(c.GetString("end"))
+	payType := strings.TrimSpace(c.GetString("pay_type"))
+	status := strings.TrimSpace(c.GetString("status"))
 
-    in["merchant_order_id"] = merchantNo
-    in["pay_type_code"] = payType
-    in["status"] = status
-    in["merchant_uid"] = u.MerchantUid
+	fmt.Println("！！！！！！！！start:", start)
+	fmt.Println("！！！！！！！！end:", end)
+	fmt.Println("！！！！！！！！status:", status)
 
-    // 将日期字符串转换为时间戳
-    startTimestamp, err := convertToTimestamp(start)
-    if err != nil {
-        // 处理错误
-    }
-    endTimestamp, err := convertToTimestamp(end)
-    if err != nil {
-        // 处理错误
-    }
+	in["merchant_order_id"] = merchantNo
+	in["pay_type_code"] = payType
+	in["status"] = status
+	in["merchant_uid"] = u.MerchantUid
 
-    // 使用时间戳作为查询参数
-    if start != "" {
-        in["update_time__gte"] = strconv.FormatInt(startTimestamp, 10)
-    }
-    if end != "" {
-        in["update_time__lte"] = strconv.FormatInt(endTimestamp, 10)
-    }
+	// 将日期字符串转换为时间戳
+	startTimestamp, err := convertToTimestamp(start)
+	if err != nil {
+		// 处理错误
+	}
+	endTimestamp, err := convertToTimestamp(end)
+	if err != nil {
+		// 处理错误
+	}
 
-    // 计算分页数
-    count := models.GetOrderProfitLenByMap(in)
-    totalPage := count / limit // 计算总页数
-    if count%limit != 0 {      // 不满一页的数据按一页计算
-        totalPage++
-    }
+	// 使用时间戳作为查询参数
+	if start != "" {
+		in["update_time__gte"] = strconv.FormatInt(startTimestamp, 10)
+	}
+	if end != "" {
+		in["update_time__lte"] = strconv.FormatInt(endTimestamp, 10)
+	}
 
-    // 数据获取
-    var list []models.OrderProfitInfo
-    if page <= totalPage {
-        list = models.GetOrderProfitByMap(in, limit, (page-1)*limit)
-    }
+	// 计算分页数
+	count := models.GetOrderProfitLenByMap(in)
+	totalPage := count / limit // 计算总页数
+	if count%limit != 0 {      // 不满一页的数据按一页计算
+		totalPage++
+	}
 
-    // 数据回显
-    out := make(map[string]interface{})
-    out["limit"] = limit // 分页数据
-    out["page"] = page
-    out["totalPage"] = totalPage
-    out["root"] = list // 显示数据
+	// 数据获取
+	var list []models.OrderProfitInfo
+	if page <= totalPage {
+		list = models.GetOrderProfitByMap(in, limit, (page-1)*limit)
+	}
 
-    c.Data["json"] = out
-    c.ServeJSON()
-    c.StopRun()
+	// 数据回显
+	out := make(map[string]interface{})
+	out["limit"] = limit // 分页数据
+	out["page"] = page
+	out["totalPage"] = totalPage
+	out["root"] = list // 显示数据
+
+	c.Data["json"] = out
+	c.ServeJSON()
+	c.StopRun()
 }
 
 func (c *TradeRecord) ShowComplaintUI() {
@@ -185,107 +189,95 @@ func (c *TradeRecord) ComplaintQueryAndListPage() {
 }
 
 type TradeRecordController struct {
-    web.Controller
+	web.Controller
 }
 
 func (c *TradeRecordController) Fetch() {
-    // 获取请求参数
-    start := c.GetString("start")
-    end := c.GetString("end")
-    status := c.GetString("status")
-    fmt.Println("****************start:", start)
-    fmt.Println("****************end:", end)           
-    fmt.Println("****************status:", status)
-    
-    startTimestamp, err := convertToTimestamp(start)
-    if err != nil {
-        // 处理错误
-    }
-    endTimestamp, err := convertToTimestamp(end)
-    if err != nil {
-        // 处理错误
-    }
+	// 获取请求参数
+	start := c.GetString("start")
+	end := c.GetString("end")
+	status := c.GetString("status")
+	fmt.Println("****************start:", start)
+	fmt.Println("****************end:", end)
+	fmt.Println("****************status:", status)
 
-    fmt.Println("****************startTimestamp:", startTimestamp)
-    fmt.Println("****************endTimestamp:", endTimestamp)    
-    // 获取 token
-    token, err := c.GetToken()
-    
-    if err != nil {
-        c.Data["json"] = map[string]interface{}{"error": "获取 token 失败"}
-        c.ServeJSON()
-        return
-    }
+	startTimestamp, err := convertToTimestamp(start)
+	if err != nil {
+		// 处理错误
+	}
+	endTimestamp, err := convertToTimestamp(end)
+	if err != nil {
+		// 处理错误
+	}
 
-    // 构建 API 请求
-    apiUrl := fmt.Sprintf("https://api.onepayph.com/api/v1/disburse_order?start=%d&end=%d&status=%s&page_size=3", startTimestamp, endTimestamp, status)
-    fmt.Println("****************apiUrl:", apiUrl)
-    
-    client := &http.Client{}
-    req, err := http.NewRequest("GET", apiUrl, nil)
-    if err != nil {
-        c.Data["json"] = map[string]interface{}{"error": "创建请求失败"}
-        c.ServeJSON()
-        return
-    }
-    req.Header.Add("Authorization", "Bearer "+token)
-    fmt.Println("****************Header:", req.Header)
+	fmt.Println("****************startTimestamp:", startTimestamp)
+	fmt.Println("****************endTimestamp:", endTimestamp)
+	// 获取 token
+	token, err := c.GetToken()
 
-    // 发起请求
-    resp, err := client.Do(req)
-    if err != nil {
-        c.Data["json"] = map[string]interface{}{"error": "请求 API 失败"}
-        c.ServeJSON()
-        return
-    }
-    defer resp.Body.Close()
+	if err != nil {
+		c.Data["json"] = map[string]interface{}{"error": "获取 token 失败"}
+		c.ServeJSON()
+		return
+	}
 
-    // 解析响应
-    var result interface{}
-    json.NewDecoder(resp.Body).Decode(&result)
+	// 构建 API 请求
+	apiUrl := fmt.Sprintf("https://api.onepayph.com/api/v1/disburse_order?start=%d&end=%d&status=%s&page_size=3", startTimestamp, endTimestamp, status)
+	fmt.Println("****************apiUrl:", apiUrl)
 
-    // 返回结果
-    c.Data["json"] = result
-    fmt.Println("****************result:", result)
-    c.ServeJSON()
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", apiUrl, nil)
+	if err != nil {
+		c.Data["json"] = map[string]interface{}{"error": "创建请求失败"}
+		c.ServeJSON()
+		return
+	}
+	req.Header.Add("Authorization", "Bearer "+token)
+	fmt.Println("****************Header:", req.Header)
+
+	// 发起请求
+	resp, err := client.Do(req)
+	if err != nil {
+		c.Data["json"] = map[string]interface{}{"error": "请求 API 失败"}
+		c.ServeJSON()
+		return
+	}
+	defer resp.Body.Close()
+
+	// 解析响应
+	var result interface{}
+	json.NewDecoder(resp.Body).Decode(&result)
+
+	// 返回结果
+	c.Data["json"] = result
+	fmt.Println("****************result:", result)
+	c.ServeJSON()
 }
 
 func convertToTimestamp(dateTimeStr string) (int64, error) {
-    if dateTimeStr == "" {
-        return 0, nil
-    }
+	if dateTimeStr == "" {
+		return 0, nil
+	}
 
-    layout := "2006-01-02 15:04:00" // Go 的时间格式化布局
-    t, err := time.Parse(layout, dateTimeStr)
-    if err != nil {
-        return 0, err
-    }
+	layout := "2006-01-02 15:04:00" // Go 的时间格式化布局
+	t, err := time.Parse(layout, dateTimeStr)
+	if err != nil {
+		return 0, err
+	}
 
-    return t.UnixMilli(), nil
+	return t.UnixMilli(), nil
 }
-
 
 // GetToken 从会话中获取 token
 func (c *TradeRecordController) GetToken() (string, error) {
-    // us := c.GetSession(enum.UserSession) // 假设 session 名称为 "userSession"
-    // if us == nil {
-    //     return "", fmt.Errorf("用户未登录")
-    // }
-    // u, ok := us.(models.MerchantInfo)
-    
-    // fmt.Println("!!!!!!!!!!!!Merchant Key:", u.MerchantKey)
-    
-    // if !ok {
-    //     return "", fmt.Errorf("无法获取用户信息")
-    // }
-    us := c.GetSession(enum.UserSession)
-    if us == nil {
-        c.Data["json"] = map[string]string{"error": "User not logged in"}
-        c.ServeJSON()
-        return "", fmt.Errorf("用户未登录")
-    }
-    u := us.(models.MerchantInfo)
-    
-    fmt.Println("Merchant Key:", u.MerchantKey)
-    return u.MerchantKey, nil
+	us := c.GetSession(enum.UserSession)
+	if us == nil {
+		c.Data["json"] = map[string]string{"error": "User not logged in"}
+		c.ServeJSON()
+		return "", fmt.Errorf("用户未登录")
+	}
+	u := us.(models.MerchantInfo)
+
+	fmt.Println("Merchant Key:", u.MerchantKey)
+	return u.MerchantKey, nil
 }
