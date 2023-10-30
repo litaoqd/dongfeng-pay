@@ -18,6 +18,7 @@ import (
     "merchant/sys/enum"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type TradeRecord struct {
@@ -39,61 +40,72 @@ func (c *TradeRecord) ShowUI() {
 	c.TplName = "trade_record.html"
 }
 
-// 订单记录查询分页
+// TradeQueryAndListPage 方法的修改
 func (c *TradeRecord) TradeQueryAndListPage() {
-	us := c.GetSession(enum.UserSession)
-	u := us.(models.MerchantInfo)
+    us := c.GetSession(enum.UserSession)
+    u := us.(models.MerchantInfo)
 
-	// 分页参数
-	page, _ := strconv.Atoi(c.GetString("page"))
-	limit, _ := strconv.Atoi(c.GetString("limit"))
-	if limit == 0 {
-		limit = 15
-	}
+    // 分页参数
+    page, _ := strconv.Atoi(c.GetString("page"))
+    limit, _ := strconv.Atoi(c.GetString("limit"))
+    if limit == 0 {
+        limit = 15
+    }
 
-	// 查询参数
-	in := make(map[string]string)
-	merchantNo := strings.TrimSpace(c.GetString("MerchantNo"))
-	start := strings.TrimSpace(c.GetString("start"))
-	end := strings.TrimSpace(c.GetString("end"))
-	payType := strings.TrimSpace(c.GetString("pay_type"))
-	status := strings.TrimSpace(c.GetString("status"))
+    // 查询参数
+    in := make(map[string]string)
+    merchantNo := strings.TrimSpace(c.GetString("MerchantNo"))
+    start := strings.TrimSpace(c.GetString("start"))
+    end := strings.TrimSpace(c.GetString("end"))
+    payType := strings.TrimSpace(c.GetString("pay_type"))
+    status := strings.TrimSpace(c.GetString("status"))
 
-	in["merchant_order_id"] = merchantNo
-	in["pay_type_code"] = payType
-	in["status"] = status
-	in["merchant_uid"] = u.MerchantUid
+    in["merchant_order_id"] = merchantNo
+    in["pay_type_code"] = payType
+    in["status"] = status
+    in["merchant_uid"] = u.MerchantUid
 
-	if start != "" {
-		in["update_time__gte"] = start
-	}
-	if end != "" {
-		in["update_time_lte"] = end
-	}
+    // 将日期字符串转换为时间戳
+    startTimestamp, err := convertToTimestamp(start)
+    if err != nil {
+        // 处理错误
+    }
+    endTimestamp, err := convertToTimestamp(end)
+    if err != nil {
+        // 处理错误
+    }
 
-	// 计算分页数
-	count := models.GetOrderProfitLenByMap(in)
-	totalPage := count / limit // 计算总页数
-	if count%limit != 0 {      // 不满一页的数据按一页计算
-		totalPage++
-	}
+    // 使用时间戳作为查询参数
+    if start != "" {
+        in["update_time__gte"] = strconv.FormatInt(startTimestamp, 10)
+    }
+    if end != "" {
+        in["update_time__lte"] = strconv.FormatInt(endTimestamp, 10)
+    }
 
-	// 数据获取
-	var list []models.OrderProfitInfo
-	if page <= totalPage {
-		list = models.GetOrderProfitByMap(in, limit, (page-1)*limit)
-	}
+    // 计算分页数
+    count := models.GetOrderProfitLenByMap(in)
+    totalPage := count / limit // 计算总页数
+    if count%limit != 0 {      // 不满一页的数据按一页计算
+        totalPage++
+    }
 
-	// 数据回显
-	out := make(map[string]interface{})
-	out["limit"] = limit // 分页数据
-	out["page"] = page
-	out["totalPage"] = totalPage
-	out["root"] = list // 显示数据
+    // 数据获取
+    var list []models.OrderProfitInfo
+    if page <= totalPage {
+        list = models.GetOrderProfitByMap(in, limit, (page-1)*limit)
+    }
 
-	c.Data["json"] = out
-	c.ServeJSON()
-	c.StopRun()
+    // 数据回显
+    out := make(map[string]interface{})
+    out["limit"] = limit // 分页数据
+    out["page"] = page
+    out["totalPage"] = totalPage
+    out["root"] = list // 显示数据
+
+    c.Data["json"] = out
+    c.ServeJSON()
+    c.StopRun()
 }
 
 func (c *TradeRecord) ShowComplaintUI() {
@@ -181,6 +193,15 @@ func (c *TradeRecordController) Fetch() {
     start := c.GetString("start")
     end := c.GetString("end")
     status := c.GetString("status")
+        
+    startTimestamp, err := convertToTimestamp(start)
+    if err != nil {
+        // 处理错误
+    }
+    endTimestamp, err := convertToTimestamp(end)
+    if err != nil {
+        // 处理错误
+    }
 
     // 获取 token
     token, err := c.GetToken()
@@ -192,7 +213,9 @@ func (c *TradeRecordController) Fetch() {
     }
 
     // 构建 API 请求
-    apiUrl := fmt.Sprintf("https://api.onepayph.com/api/v1/disburse_order?start=%s&end=%s&status=%s&page_size=3", start, end, status)
+    apiUrl := fmt.Sprintf("https://api.onepayph.com/api/v1/disburse_order?start=%d&end=%d&status=%s&page_size=3", startTimestamp, endTimestamp, status)
+    fmt.Println("****************apiUrl:", apiUrl)
+    
     client := &http.Client{}
     req, err := http.NewRequest("GET", apiUrl, nil)
     if err != nil {
@@ -221,6 +244,20 @@ func (c *TradeRecordController) Fetch() {
     fmt.Println("****************result:", result)
     c.ServeJSON()
 }
+
+func convertToTimestamp(dateStr string) (int64, error) {
+    if dateStr == "" {
+        return 0, nil
+    }
+    // 假设日期格式为 "MM/DD/YYYY"
+    layout := "01/02/2006"
+    t, err := time.Parse(layout, dateStr)
+    if err != nil {
+        return 0, err
+    }
+    return t.UnixNano(), nil // 返回秒级时间戳
+}
+
 
 // GetToken 从会话中获取 token
 func (c *TradeRecordController) GetToken() (string, error) {

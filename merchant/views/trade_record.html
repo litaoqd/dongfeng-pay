@@ -126,8 +126,11 @@
 </div>
     <select class="form-control mr-3 status-input" id="status">
                                         <option value="">全部状态</option>
-                                        <option value="pending">待处理</option>
-                                        <option value="processed">已处理</option>
+                                        <option value="processing">处理中</option>
+                                        <option value="succeeded">交易成功</option>
+                                         <option value="failed">交易失败</option>
+                                        <option value="accounted">已入帐</option>
+                                        
                                         <!-- ... 其他状态 ... -->
                                     </select>
                                     <button onclick="fetchTradeRecords()" class="btn btn-primary">搜索</button>
