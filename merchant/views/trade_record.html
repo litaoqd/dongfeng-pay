@@ -52,10 +52,35 @@
             width: 180px;
             /* 设置日期时间输入框的宽度 */
         }
+        
+        /* 分页按钮样式调整 */
+        .pagination-buttons {
+            text-align: right; /* 将按钮对齐到右侧 */
+            margin-top: 20px; /* 在按钮上方添加一些空间 */
+        }
+        
+        .pagination-buttons button {
+            background-color: #007bff; /* 主要按钮颜色，与搜索按钮一致 */
+            color: white;
+            border: none;
+            padding: 6px 12px; /* 调整填充以减小按钮大小 */
+            margin: 5px;
+            border-radius: 4px; /* 圆角大小与搜索按钮一致 */
+            font-size: 14px; /* 字体大小与搜索按钮一致 */
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s; /* 平滑过渡效果 */
+        }
+        
+        .pagination-buttons button:hover {
+            background-color: #0056b3; /* 鼠标悬停时的颜色变暗 */
+            transform: scale(1.03); /* 鼠标悬停时轻微放大按钮 */
+        }
     </style>
+    
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
+        
 </head>
 
 <body>
@@ -186,6 +211,7 @@
                                         <div id="tradeRecordResult"></div>
                                     </div>
                                     <div class="pagination-buttons">
+                                    <!--<div>-->
                                         <button id="prevPageButton" onclick="fetchPreviousPage()">上一页</button>
                                         <button id="nextPageButton" onclick="fetchNextPage()">下一页</button>
                                     </div>
