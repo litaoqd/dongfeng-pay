@@ -24,7 +24,80 @@
     <link rel="shortcut icon" href="../static/img/icon.ico" type="image/x-icon"/>
 
     <link href="../static/vendor/toastr-2.1.4-7/toastr.min.css" rel="stylesheet">
+    <!-- 内嵌CSS -->
+    <style>
+        .image-row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
 
+        .image-column {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .image-column img {
+            max-width: 80px; /* 控制图片最大宽度 */
+            height: auto; /* 保持图片原始比例 */
+            margin: 15px;
+            border-radius: 8px; /* 圆角效果 */
+        }
+
+        .logo-container {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .image-column img {
+                max-width: 60px; /* 移动设备上的图片大小 */
+            }
+
+            .logo-container {
+                position: static;
+                text-align: center;
+                margin-top: 20px;
+            }
+        }
+        
+        .logo h1 {
+            margin-bottom: 30px; /* 增加标题下边距 */
+        }
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to right, #6DD5FA, #FF758C); /* 背景渐变 */
+    }
+
+    .btn-primary {
+        background-color: #0056b3;
+        transition: transform 0.3s, box-shadow 0.3s;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px 0 rgba(0,0,0,0.3);
+    }
+
+    .info {
+        background-color: rgba(255, 255, 255, 0.9); /* 半透明背景 */
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .image-column img {
+        transition: transform 0.3s;
+    }
+
+    .image-column img:hover {
+        transform: scale(1.1); /* 图片放大效果 */
+    }
+    </style>
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
@@ -42,6 +115,19 @@
                                 <h1>OnePay-商户后台</h1>
                             </div>
                             <p>菲律宾领先的跨境支付服务商。通过打造全球一站式跨境支付与资金清结算平台，帮助跨境企业安全高效地进行全球资金收付、货币兑换等业务。</p>
+                            <!-- 图片区域 -->
+                            <div class="image-row">
+                                <div class="image-column">
+                                    <img src="../static/img/gcash.png" alt="GCash">
+                                    <img src="../static/img/paymaya.png" alt="PayMaya">
+                                    <img src="../static/img/grab.png" alt="Grab">
+                                </div>
+                                <div class="image-column">
+                                    <img src="../static/img/bdo.png" alt="BDO">
+                                    <img src="../static/img/visa.png" alt="Visa">
+                                    <img src="../static/img/mastercard.png" alt="MasterCard">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

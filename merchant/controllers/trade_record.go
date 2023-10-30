@@ -10,8 +10,12 @@
 package controllers
 
 import (
-	"merchant/models"
-	"merchant/sys/enum"
+    "encoding/json"
+    "fmt"
+    "net/http"
+    "merchant/models" // 确保导入正确的路径
+    "github.com/beego/beego/v2/server/web"
+    "merchant/sys/enum"
 	"strconv"
 	"strings"
 )
@@ -166,4 +170,79 @@ func (c *TradeRecord) ComplaintQueryAndListPage() {
 	c.Data["json"] = out
 	c.ServeJSON()
 	c.StopRun()
+}
+
+type TradeRecordController struct {
+    web.Controller
+}
+
+func (c *TradeRecordController) Fetch() {
+    // 获取请求参数
+    start := c.GetString("start")
+    end := c.GetString("end")
+    status := c.GetString("status")
+
+    // 获取 token
+    token, err := c.GetToken()
+    
+    if err != nil {
+        c.Data["json"] = map[string]interface{}{"error": "获取 token 失败"}
+        c.ServeJSON()
+        return
+    }
+
+    // 构建 API 请求
+    apiUrl := fmt.Sprintf("https://api.onepayph.com/api/v1/disburse_order?start=%s&end=%s&status=%s&page_size=3", start, end, status)
+    client := &http.Client{}
+    req, err := http.NewRequest("GET", apiUrl, nil)
+    if err != nil {
+        c.Data["json"] = map[string]interface{}{"error": "创建请求失败"}
+        c.ServeJSON()
+        return
+    }
+    req.Header.Add("Authorization", "Bearer "+token)
+    fmt.Println("****************Header:", req.Header)
+
+    // 发起请求
+    resp, err := client.Do(req)
+    if err != nil {
+        c.Data["json"] = map[string]interface{}{"error": "请求 API 失败"}
+        c.ServeJSON()
+        return
+    }
+    defer resp.Body.Close()
+
+    // 解析响应
+    var result interface{}
+    json.NewDecoder(resp.Body).Decode(&result)
+
+    // 返回结果
+    c.Data["json"] = result
+    fmt.Println("****************result:", result)
+    c.ServeJSON()
+}
+
+// GetToken 从会话中获取 token
+func (c *TradeRecordController) GetToken() (string, error) {
+    // us := c.GetSession(enum.UserSession) // 假设 session 名称为 "userSession"
+    // if us == nil {
+    //     return "", fmt.Errorf("用户未登录")
+    // }
+    // u, ok := us.(models.MerchantInfo)
+    
+    // fmt.Println("!!!!!!!!!!!!Merchant Key:", u.MerchantKey)
+    
+    // if !ok {
+    //     return "", fmt.Errorf("无法获取用户信息")
+    // }
+    us := c.GetSession(enum.UserSession)
+    if us == nil {
+        c.Data["json"] = map[string]string{"error": "User not logged in"}
+        c.ServeJSON()
+        return "", fmt.Errorf("用户未登录")
+    }
+    u := us.(models.MerchantInfo)
+    
+    fmt.Println("Merchant Key:", u.MerchantKey)
+    return u.MerchantKey, nil
 }

@@ -2,7 +2,50 @@
 <html>
 <head>
     {{template "template/css.html"}}
+    <style>
+        .trade-record-details table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-family: 'Arial', sans-serif;
+}
+
+.trade-record-details th, .trade-record-details td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.trade-record-details th {
+    background-color: #f2f2f2;
+    color: #333;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.trade-record-details td {
+    color: #555;
+}
+    .status-input {
+        width: 120px; /* 调整状态选择框的宽度 */
+    }
+        .date-input {
+        width: 150px; /* 调整日期输入框的宽度 */
+    }
+
+    .status-input {
+        width: 120px; /* 调整状态选择框的宽度 */
+    }
+    
+        .start-time-label {
+        margin-right: 10px; /* 调整标签和输入框之间的间隔 */
+    }
+
+    </style>
+    
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
 </head>
+
 <body>
 <div class="page">
     <!-- Main Navbar-->
@@ -63,72 +106,37 @@
             <!-- Page Header-->
             <header class="page-header">
                 <div class="container-fluid">
-                    <h2 class="no-margin-bottom">订单记录</h2>
+                    <h2 class="no-margin-bottom">交易记录 - 请输入搜索条件，点击搜索查询</h2>
                 </div>
             </header>
             <!-- Forms Section-->
-            <section class="forms no">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-header d-flex align-items-center">
-                            <lable class="form-inline">
-                                <input type="text" class="form-control" id="merchant_No" placeholder="商户订单号"
-                                       autofocus>&nbsp;&nbsp;
-                                <label>开始时间：</label>
-                                <div class='input-group date'>
-                                    <input type='text' id='startTime' class="form-control"/>
-                                </div>&nbsp;&nbsp;
-                                <label>截止时间：</label>
-                                <div class='input-group date'>
-                                    <input type='text' id='endTime' class="form-control"/>
-                                </div>&nbsp;&nbsp;
-                                <label>支付方式：</label>
-                                <select class="form-control" id="payType">
-                                    <option value="">全部</option>
-                                    {{range $k,$v:=.payType}}
-                                        <option value="{{$k}}">{{$v}}</option>
-                                    {{end}}
-                                </select> &nbsp;&nbsp;
-                                <label>订单状态：</label>
-                                <select class="form-control" id="uStatus">
-                                    <option value="">全部</option>
-                                    {{range $k,$v:=.status}}
-                                        <option value="{{$k}}">{{$v}}</option>
-                                    {{end}}
-                                </select> &nbsp;&nbsp;
-                                <button type="button" onclick="trade.trade_do_paging()"
-                                        class="btn btn-primary">搜索
-                                </button>&nbsp;&nbsp;
-                                <button type="button" onclick="excel.download_trade_order_excel()"
-                                        class="btn btn-outline-dark">导出Excel表
-                                </button>
-                            </lable>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>平台订单号</th>
-                                        <th>商户订单号</th>
-                                        <th>支付方式</th>
-                                        <th>订单金额</th>
-                                        <th>收入金额</th>
-                                        <th>手续费</th>
-                                        <th>状 态</th>
-                                        <th>成功支付时间</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody id="your_show_time">
-
-                                    </tbody>
-                                </table>
+            <section class="forms">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-header d-flex align-items-center search-container">
+<div class="d-flex align-items-center search-container">
+    <label  class="start-time-label" for="start">开始时间: </label>
+    <input type="text" id="start" class="form-control mr-3 datepicker date-input" placeholder="开始时间">
+    <label  class="start-time-label" for="end">结束时间: </label>
+    <input type="text" id="end" class="form-control mr-3 datepicker date-input" placeholder="结束时间">
+  
+    <!-- ... 其他元素 ... -->
+</div>
+    <select class="form-control mr-3 status-input" id="status">
+                                        <option value="">全部状态</option>
+                                        <option value="pending">待处理</option>
+                                        <option value="processed">已处理</option>
+                                        <!-- ... 其他状态 ... -->
+                                    </select>
+                                    <button onclick="fetchTradeRecords()" class="btn btn-primary">搜索</button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="tradeRecordResult"></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="card-header d-flex align-items-center">
-                        <ul id="do_paging"></ul>
                     </div>
                 </div>
             </section>
@@ -137,32 +145,90 @@
 </div>
 <!-- JavaScript files-->
 {{template "template/js.html"}}
-<script type="application/javascript">
-    $(function () {
-        $("#startTime").datetimepicker({
-            format: 'yyyy-mm-dd hh:ii:ss',
-            autoclose: true,
-            todayBtn: true,
-            startDate: "2019-4-10 18:45:06",
-            minuteStep: 20,
-        });
+<!-- 在其他 JavaScript 文件之前添加 jQuery 和 jQuery UI 的脚本 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+// $(document).ready(function(){
+//     $('.datepicker').datepicker({
+//         format: 'yyyy-mm-dd',
+//         autoclose: true
+//     });
+// });
+$(document).ready(function(){
+    var startDateInput = $('#start');
+    var endDateInput = $('#end');
 
-        $("#endTime").datetimepicker({
-            format: 'yyyy-mm-dd hh:ii:ss',
-            autoclose: true,
-            todayBtn: true,
-            startDate: "2019-4-10 18:45:06",
-            minuteStep: 20
-        });
-
-        let start = $("#startTime").val();
-        if (start === "") {
-            let ds = trade.get_last_month_date();
-            $("#startTime").datetimepicker("setDate", new Date(ds));
+    startDateInput.datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        endDate: new Date(), // 可选：限制开始日期最大值为今天
+        onSelect: function(selectedDate) {
+            // 设置结束日期的最小值
+            endDateInput.datepicker('option', 'minDate', selectedDate);
         }
-
-        trade.trade_do_paging();
     });
+
+    endDateInput.datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        startDate: new Date(), // 可选：限制结束日期最小值为今天
+        onSelect: function(selectedDate) {
+            // 设置开始日期的最大值
+            startDateInput.datepicker('option', 'maxDate', selectedDate);
+        }
+    });
+});
+
+function fetchTradeRecords() {
+    var start = $('#start').val();
+    var end = $('#end').val();
+    var status = $('#status').val();
+    var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}`;
+
+    fetch(apiUrl)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        displayTradeRecordData(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('tradeRecordResult').innerHTML = '<p class="trade-record-not-found">未找到交易记录</p>';
+    });
+}
+
+function displayTradeRecordData(tradeRecordData) {
+    // 检查是否存在交易记录
+    if (!tradeRecordData || tradeRecordData.data.length === 0) {
+        document.getElementById('tradeRecordResult').innerHTML = '<p class="trade-record-not-found">未找到交易记录</p>';
+        return;
+    }
+
+    // 构建交易记录详情的 HTML 结构
+    var tradeRecordDetails = '<div class="trade-record-details"><table>';
+    tradeRecordDetails += '<tr><th>商户交易 ID<br>(Merchant Trade ID)</th><th>金额<br>(Amount)</th><th>银行账户名<br>(Bank Account Name)</th><th>银行账号<br>(Bank Account No)</th><th>交易时间<br>(Transaction Time)</th><th>状态<br>(Status)</th></tr>';
+    tradeRecordData.data.forEach(function(item) {
+        var transTime = new Date(parseInt(item.trans_at)).toLocaleString();
+        tradeRecordDetails += `<tr>
+            <td>${item.ref_trade_id}</td>
+            <td>${item.amount} ${item.currency}</td>
+            <td>${item.bank_account_name}</td>
+            <td>${item.bank_account_no}</td>
+            <td>${transTime}</td>
+            <td>${item.status}</td>
+        </tr>`;
+    });
+    tradeRecordDetails += '</table></div>';
+
+    // 将构建的 HTML 显示在页面上
+    document.getElementById('tradeRecordResult').innerHTML = tradeRecordDetails;
+}
+
 </script>
 </body>
 </html>
