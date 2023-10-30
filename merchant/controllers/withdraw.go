@@ -166,12 +166,12 @@ func verifyAccountAndMoney(bankCode, accountName, cardNo, bankAccountType, provi
 		return false, msg
 	}
 
-	if strings.Compare(enum.PublicAccount, bankAccountType) == 0 {
-		if province == "" || city == "" || bankAccountAddress == "" {
-			msg = "开户行全称、所在省份或所在城市不能为空!"
-			return false, msg
-		}
-	}
+// 	if strings.Compare(enum.PublicAccount, bankAccountType) == 0 {
+// 		if province == "" || city == "" || bankAccountAddress == "" {
+// 			msg = "开户行全称、所在省份或所在城市不能为空!"
+// 			return false, msg
+// 		}
+// 	}
 
 	if f > enum.WithdrawalMaxAmount || f < enum.WithdrawalMinAmount || f+enum.SettlementFee > ac.WaitAmount {
 		utils.LogInfo(fmt.Sprintf("提现金额超出限制，提现金额：%f，账户可结算余额：%f，提现最小额：%d，最大额：%d，手续费：%d",

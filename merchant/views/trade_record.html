@@ -60,21 +60,49 @@
         }
         
         .pagination-buttons button {
-            background-color: #007bff; /* 主要按钮颜色，与搜索按钮一致 */
+            background-color: #007bff; /* 主要按钮颜色 */
             color: white;
             border: none;
-            padding: 6px 12px; /* 调整填充以减小按钮大小 */
+            padding: 6px 12px;
             margin: 5px;
-            border-radius: 4px; /* 圆角大小与搜索按钮一致 */
-            font-size: 14px; /* 字体大小与搜索按钮一致 */
+            border-radius: 4px;
+            font-size: 14px;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s; /* 平滑过渡效果 */
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* 添加阴影变化的过渡 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 初始阴影 */
         }
         
         .pagination-buttons button:hover {
             background-color: #0056b3; /* 鼠标悬停时的颜色变暗 */
-            transform: scale(1.03); /* 鼠标悬停时轻微放大按钮 */
+            transform: scale(1.1); /* 鼠标悬停时放大按钮 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* 鼠标悬停时增加阴影 */
         }
+        
+        .pagination-buttons button:disabled {
+            background-color: #cccccc; /* 灰色背景 */
+            color: #666666; /* 深灰色文字 */
+            cursor: not-allowed; /* 鼠标样式改为不允许的图标 */
+        }
+        
+        /* 页码样式 */
+        .pagination-page-number {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 5px 10px;
+            background: #4a90e2; /* 统一的蓝色调 */
+            color: white;
+            border-radius: 5px; /* 圆角 */
+            border: 1px solid #3876ac; /* 细边框增加质感 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s; /* 过渡效果 */
+        }
+        
+        .pagination-page-number:hover {
+            transform: translateY(-2px); /* 悬停时轻微上移 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* 悬停时增加阴影 */
+        }
+        
     </style>
     
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -118,16 +146,16 @@
                             <i class="icon icon-user"></i>
                             账户管理
                         </a>
-                        <ul id="exampledropdownDropdown" class="collapse list-unstyled ">
+                        <ul id="exampledropdownDropdown" class="list-unstyled ">
                             <li>
                                 <a href="/user_info/show_modify_ui">修改密码</a>
                             </li>
                             <li>
                                 <a href="/user_info/show_ui">账户资料</a>
                             </li>
-                            <li>
-                                <a href="/index/show_pay_way_ui">通道配置</a>
-                            </li>
+                            <!--<li>-->
+                            <!--    <a href="/index/show_pay_way_ui">通道配置</a>-->
+                            <!--</li>-->
                         </ul>
                     </li>
                     <li>
@@ -135,16 +163,16 @@
                             <i class="icon icon-presentation"></i>
                             订单管理
                         </a>
-                        <ul id="exampledropdownDropdown1" class=" list-unstyled ">
+                        <ul id="exampledropdownDropdown1" class="collapse list-unstyled ">
                             <li>
                                 <a href="/query_order/ui">查询订单</a>
                             </li>
                             <li class="active">
                                 <a href="/trade/show_ui">订单记录</a>
                             </li>
-                            <li>
-                                <a href="/trade/show_complaint_ui">投诉列表</a>
-                            </li>
+                            <!--<li>-->
+                            <!--    <a href="/trade/show_complaint_ui">投诉列表</a>-->
+                            <!--</li>-->
                         </ul>
                     </li>
                     <li>
@@ -156,20 +184,20 @@
                             <li>
                                 <a href="/withdraw/show_ui">申请提现</a>
                             </li>
-                            <li>
-                                <a href="/multi_withdraw/show_multi_ui">批量申请提现</a>
-                            </li>
-                            <li>
-                                <a href="/withdraw/show_list_ui">提现记录</a>
-                            </li>
-                            {{/*
-                            <li>
-                                <a href="/recharge/show_recharge_list_ui">自定义记录</a>
-                            </li>
-                            */}}
-                            <li>
-                                <a href="/history/show_history_list_ui">资产变动明细</a>
-                            </li>
+                            <!--<li>-->
+                            <!--    <a href="/multi_withdraw/show_multi_ui">批量申请提现</a>-->
+                            <!--</li>-->
+                            <!--<li>-->
+                            <!--    <a href="/withdraw/show_list_ui">提现记录</a>-->
+                            <!--</li>-->
+                            <!--{{/*-->
+                            <!--<li>-->
+                            <!--    <a href="/recharge/show_recharge_list_ui">自定义记录</a>-->
+                            <!--</li>-->
+                            <!--*/}}-->
+                            <!--<li>-->
+                            <!--    <a href="/history/show_history_list_ui">资产变动明细</a>-->
+                            <!--</li>-->
                         </ul>
                     </li>
                 </ul>
@@ -212,8 +240,9 @@
                                     </div>
                                     <div class="pagination-buttons">
                                     <!--<div>-->
-                                        <button id="prevPageButton" onclick="fetchPreviousPage()">上一页</button>
-                                        <button id="nextPageButton" onclick="fetchNextPage()">下一页</button>
+                                            <button id="prevPageButton" onclick="fetchPreviousPage()">上一页</button>
+                                            <span id="currentPage">1</span> <!-- 用于显示当前页码 -->
+                                            <button id="nextPageButton" onclick="fetchNextPage()">下一页</button>
                                     </div>
                                 </div>
                             </div>
@@ -241,6 +270,22 @@
             startAfter: '',
             endBefore: ''
         };
+        var currentPage = 1; // 初始页码设置为 1
+        function updateCurrentPageDisplay() {
+            document.getElementById('currentPage').innerText = currentPage;
+        }
+        function fetchNextPage() {
+            currentPage++; // 增加页码
+            updateCurrentPageDisplay();
+            fetchTradeRecords(paginationInfo.startAfter, '');
+        }
+        
+        function fetchPreviousPage() {
+            if (currentPage > 1) currentPage--; // 减少页码
+            updateCurrentPageDisplay();
+            fetchTradeRecords('', paginationInfo.endBefore);
+        }
+        
         $(document).ready(function () {
             var currentDate = new Date();
             var defaultStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), currentDate.getHours(), currentDate.getMinutes(), 0);
@@ -269,6 +314,11 @@
                 },
                 timepicker: true
             });
+            
+            // 禁用上一页和下一页按钮
+            document.getElementById('prevPageButton').disabled = true;
+            document.getElementById('nextPageButton').disabled = true;
+            updateCurrentPageDisplay(); // 初始化页码显示
         });
 
         function fetchTradeRecords(startAfter = '', endBefore = '') {
@@ -278,7 +328,6 @@
             // var pageSize = 2; // 根据需要调整
             // var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}&page_size=${pageSize}&start_after=${startAfter}&end_before=${endBefore}`;
             var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}&start_after=${startAfter}&end_before=${endBefore}`;
-            // var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}`;
 
             fetch(apiUrl)
                 .then(response => {
@@ -288,7 +337,9 @@
                     return response.json();
                 })
                 .then(data => {
+                    console.log("Fetched Data:", data); // 添加调试语句
                     displayTradeRecordData(data);
+                    updatePaginationButtons(data); // 新增调用
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -327,14 +378,24 @@
             // 将构建的 HTML 显示在页面上
             document.getElementById('tradeRecordResult').innerHTML = tradeRecordDetails;
         }
-
-
-        function fetchNextPage() {
-            fetchTradeRecords(paginationInfo.startAfter, '');
-        }
-
-        function fetchPreviousPage() {
-            fetchTradeRecords('', paginationInfo.endBefore);
+        
+        function updatePaginationButtons(data) {
+            var prevPageButton = document.getElementById('prevPageButton');
+            var nextPageButton = document.getElementById('nextPageButton');
+        
+            // 如果只有 start_after，表示是第一页
+            if (data.start_after && !data.end_before) {
+                prevPageButton.disabled = true;
+            } else {
+                prevPageButton.disabled = false;
+            }
+        
+            // 如果只有 end_before，表示是最后一页
+            if (data.end_before && !data.start_after) {
+                nextPageButton.disabled = true;
+            } else {
+                nextPageButton.disabled = false;
+            }
         }
     </script>
 </body>
