@@ -97,7 +97,8 @@ let pay = {
                 default:
                     st = ""
             }
-            con += `<tr><th scope="row">` + (index + 1) + `</th><td>` + item.BankOrderId + `</td><td>` + item.MerchantOrderId + `</td><td>` + item.PayforTotalAmount.toFixed(2) + `</td><td>` + item.PayforFee.toFixed(2) + `</td><td>` + item.BankName + `</td><td>` + item.BankAccountName + `</td><td>` + item.BankAccountNo + `</td><td` + bg_red + `>` + st + `</td><td>` + item.CreateTime + `</td><td>` + t + `</td><td>` + item.Remark + `</td></tr>`
+            // con += `<tr><th scope="row">` + (index + 1) + `</th><td>` + item.BankOrderId + `</td><td>` + item.MerchantOrderId + `</td><td>` + item.PayforTotalAmount.toFixed(2) + `</td><td>` + item.PayforFee.toFixed(2) + `</td><td>` + item.BankName + `</td><td>` + item.BankAccountName + `</td><td>` + item.BankAccountNo + `</td><td` + bg_red + `>` + st + `</td><td>` + item.CreateTime + `</td><td>` + t + `</td><td>` + item.Remark + `</td></tr>`
+            con += `<tr><th scope="row">` + (index + 1) + `</th><td>` + item.BankName + `</td><td>` + item.BankAccountName + `</td><td>` + item.BankAccountNo + `</td><td` + bg_red + `>` + item.PayforTotalAmount.toFixed(2) + `</td><td>` + bg_red + st + `</td><td>` + item.CreateTime + `</td><td>` + t + `</td><td>` + item.Remark + `</td></tr>`
         });
         if (con === "") {
             con += `<tr><td colspan="9">没有检索到数据</td></tr>`

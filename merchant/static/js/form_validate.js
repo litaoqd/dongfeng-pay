@@ -100,48 +100,44 @@ let form_v = {
         let bankCode = $("#bankCode").val();
         let accountName = $("#accountName").val();
         let cardNo = $("#cardNo").val();
-        let bankAccountType = $("#bankAccountType").val();
-        let province = $("#province").val();
-        let city = $("#city").val();
-        let bankAccountAddress = $("#bankAccountAddress").val();
-        let moblieNo = $("#moblieNo").val();
+        // let bankAccountType = $("#bankAccountType").val();
+        // let province = $("#province").val();
+        // let city = $("#city").val();
+        // let bankAccountAddress = $("#bankAccountAddress").val();
+        // let moblieNo = $("#moblieNo").val();
         let amount = $("#amount").val();
-        let smsVerifyCode = $("#smsVerifyCode").val();
+        let googleCode = $("#googleCode").val();
         let patrn = /^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/;
         let patrn2 = /^[1]([3-9])[0-9]{9}$/;
         if (bankCode === "" || accountName === "" || cardNo === "") {
             toastr.error("银行名、账户名或卡号不能为空!");
             return
         }
-        if (amount === "" || moblieNo === "") {
-            toastr.error("手机号或金额不能为空!");
-            return
-        }
-        if (!patrn2.exec(moblieNo)) {
-            toastr.error("请输入正确的手机号!");
-            return
-        }
+        // if (amount === "" || moblieNo === "") {
+        //     toastr.error("手机号或金额不能为空111!");
+        //     return
+        // }
+        // if (!patrn2.exec(moblieNo)) {
+        //     toastr.error("请输入正确的手机号!");
+        //     return
+        // }
         if (!patrn.exec(amount)) {
             toastr.error("请输入正确的金额!");
             return
         }
-        if ("PUBLIC_ACCOUNT" === bankAccountType) {
-            if (province === "" || city === "" || bankAccountAddress === "") {
-                toastr.error("开户行全称、所在省份或所在城市不能为空!");
-                return
-            }
-        }
+        // if ("PUBLIC_ACCOUNT" === bankAccountType) {
+        //     if (province === "" || city === "" || bankAccountAddress === "") {
+        //         toastr.error("开户行全称、所在省份或所在城市不能为空!");
+        //         return
+        //     }
+        // }
         if (parseInt(amount) > parseInt(balance) || parseInt(amount) > 50000) {
             toastr.error("提现金额超出限制!");
             return
         }
-        if (adr === "") {
-            adr = "/withdraw/send_msg/"
-        } else {
-            if (smsVerifyCode === "") {
-                toastr.error("手机号验证码不能为空!");
-                return
-            }
+        if (googleCode === "") {
+            toastr.error("google验证码不能为空!");
+            return
         }
         $.ajax({
             type: "POST", url: adr, data: $("#withdraw").serialize(), success: function (resp) {

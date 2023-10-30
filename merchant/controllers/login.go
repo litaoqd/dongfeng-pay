@@ -36,7 +36,7 @@ func (c *Login) UserLogin() {
         ranMd5 string
 
         // verify bool
-        u      models.MerchantInfo
+        u models.MerchantInfo
     )
 
     us := c.GetSession(enum.UserSession)

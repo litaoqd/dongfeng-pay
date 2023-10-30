@@ -11,14 +11,16 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/rs/xid"
+ 	"github.com/rs/xid"
 	"merchant/conf"
+// 	"agent/common"
 	"merchant/models"
 	"merchant/sys/enum"
 	"merchant/utils"
-	"regexp"
+// 	"regexp"
 	"strconv"
 	"strings"
+	"github.com/dgryski/dgoogauth"
 )
 
 type Withdraw struct {
@@ -64,11 +66,11 @@ func (c *Withdraw) SendMsgForWithdraw() {
 	bankCode := strings.TrimSpace(c.GetString("bankCode"))
 	accountName := strings.TrimSpace(c.GetString("accountName"))
 	cardNo := strings.TrimSpace(c.GetString("cardNo"))
-	bankAccountType := strings.TrimSpace(c.GetString("bankAccountType"))
-	province := strings.TrimSpace(c.GetString("province"))
-	city := strings.TrimSpace(c.GetString("city"))
-	bankAccountAddress := strings.TrimSpace(c.GetString("bankAccountAddress"))
-	moblieNo := strings.TrimSpace(c.GetString("moblieNo"))
+// 	bankAccountType := strings.TrimSpace(c.GetString("bankAccountType"))
+// 	province := strings.TrimSpace(c.GetString("province"))
+// 	city := strings.TrimSpace(c.GetString("city"))
+// 	bankAccountAddress := strings.TrimSpace(c.GetString("bankAccountAddress"))
+// 	moblieNo := strings.TrimSpace(c.GetString("moblieNo"))
 	money := strings.TrimSpace(c.GetString("amount"))
 
 	us := c.GetSession(enum.UserSession)
@@ -92,8 +94,7 @@ func (c *Withdraw) SendMsgForWithdraw() {
 	)
 
 	ac := models.GetAccountByUid(u.MerchantUid)
-	matched, msg = verifyAccountAndMoney(bankCode, accountName, cardNo, bankAccountType, province, city,
-		bankAccountAddress, moblieNo, money, ac)
+	matched, msg = verifyAccountAndMoney(bankCode, accountName, cardNo, money, ac)
 	if !matched {
 		goto stopRun
 	}
@@ -141,44 +142,37 @@ stopRun:
 }
 
 // 验证卡号和金额是否正确
-func verifyAccountAndMoney(bankCode, accountName, cardNo, bankAccountType, province, city, bankAccountAddress, moblieNo, amount string, ac models.AccountInfo) (b bool, msg string) {
+func verifyAccountAndMoney(bankCode, accountName, cardNo, amount string, ac models.AccountInfo) (b bool, msg string) {
 	if bankCode == "" || accountName == "" || cardNo == "" {
 		msg = "银行名、账户名或卡号不能为空!"
 		return false, msg
 	}
-	if moblieNo == "" || amount == "" {
-		msg = "手机号或金额不能为空!"
+	if amount == "" {
+		msg = "金额不能为空!"
 		return false, msg
 	}
-	matched, _ := regexp.MatchString(enum.MobileReg, moblieNo)
-	if !matched {
-		msg = "请输入正确的手机号!"
-		return false, msg
-	}
-	matched, _ = regexp.MatchString(enum.MoneyReg, amount)
-	if !matched {
-		msg = "请输入正确的金额!"
-		return false, msg
-	}
+// 	matched, _ := regexp.MatchString(enum.MobileReg, moblieNo)
+// 	if !matched {
+// 		msg = "请输入正确的手机号!"
+// 		return false, msg
+// 	}
+// 	matched, _ = regexp.MatchString(enum.MoneyReg, amount)
+// 	if !matched {
+// 		msg = "请输入正确的金额!"
+// 		return false, msg
+// 	}
 	f, err := strconv.ParseFloat(amount, 10)
 	if err != nil {
 		msg = "请输入正确的金额!"
 		return false, msg
 	}
 
-// 	if strings.Compare(enum.PublicAccount, bankAccountType) == 0 {
-// 		if province == "" || city == "" || bankAccountAddress == "" {
-// 			msg = "开户行全称、所在省份或所在城市不能为空!"
-// 			return false, msg
-// 		}
+// 	if f > enum.WithdrawalMaxAmount || f < enum.WithdrawalMinAmount || f+enum.SettlementFee > ac.WaitAmount {
+// 		utils.LogInfo(fmt.Sprintf("提现金额超出限制，提现金额：%f，账户可结算余额：%f，提现最小额：%d，最大额：%d，手续费：%d",
+// 			f, ac.WaitAmount, enum.WithdrawalMinAmount, enum.WithdrawalMaxAmount, enum.SettlementFee))
+// 		msg = "提现金额超出限制!"
+// 		return false, msg
 // 	}
-
-	if f > enum.WithdrawalMaxAmount || f < enum.WithdrawalMinAmount || f+enum.SettlementFee > ac.WaitAmount {
-		utils.LogInfo(fmt.Sprintf("提现金额超出限制，提现金额：%f，账户可结算余额：%f，提现最小额：%d，最大额：%d，手续费：%d",
-			f, ac.WaitAmount, enum.WithdrawalMinAmount, enum.WithdrawalMaxAmount, enum.SettlementFee))
-		msg = "提现金额超出限制!"
-		return false, msg
-	}
 
 	if f+enum.SettlementFee > ac.Balance || ac.Balance <= 0 {
 		utils.LogInfo(fmt.Sprintf("账户金额不足，提现金额：%f，账户余额：%f，手续费：%d",
@@ -190,18 +184,30 @@ func verifyAccountAndMoney(bankCode, accountName, cardNo, bankAccountType, provi
 	return true, enum.FailedToAdmin
 }
 
+// VerifyGoogleCode 验证 Google Authenticator 代码
+func VerifyGoogleCode(secret, code string) bool {
+    otpConfig := &dgoogauth.OTPConfig{
+        Secret:      secret,
+        WindowSize:  3,
+        HotpCounter: 0,
+    }
+    valid, err := otpConfig.Authenticate(code)
+    if err != nil {
+        return false
+    }
+    return valid
+}
+
 // 单笔提现申请
 func (c *Withdraw) LaunchSingleWithdraw() {
     bankCode := strings.TrimSpace(c.GetString("bankCode"))
     accountName := strings.TrimSpace(c.GetString("accountName"))
     cardNo := strings.TrimSpace(c.GetString("cardNo"))
-    bankAccountType := strings.TrimSpace(c.GetString("bankAccountType"))
-    province := strings.TrimSpace(c.GetString("province"))
-    city := strings.TrimSpace(c.GetString("city"))
-    bankAccountAddress := strings.TrimSpace(c.GetString("bankAccountAddress"))
-    moblieNo := strings.TrimSpace(c.GetString("moblieNo"))
+    // moblieNo := strings.TrimSpace(c.GetString("moblieNo"))
     money := strings.TrimSpace(c.GetString("amount"))
     googleCode := strings.TrimSpace(c.GetString("googleCode")) // 获取Google验证码
+    
+    fmt.Println("!!!!!!!!!!!!googleCode验证通过:", googleCode)
 
     us := c.GetSession(enum.UserSession)
     u := us.(models.MerchantInfo)
@@ -211,24 +217,22 @@ func (c *Withdraw) LaunchSingleWithdraw() {
         flag = enum.FailedFlag
 
         matched    bool
-
-        amount float64
+        // amount     float64
 
         ac   models.AccountInfo
         sett models.PayforInfo
         url  string
     )
-
+    var amount, _ = strconv.ParseFloat(money, 10)
+    
     // 验证Google动态验证码
-    secret := models.GetGoogleAuthSecretByUid(u.MerchantUid) // 从数据库获取用户的Google密钥
-    if !utils.VerifyGoogleCode(secret, googleCode) {
+    if !verifyGoogleCode(u.MerchantSecret, googleCode) {
         msg = "Google验证码错误！"
         goto stopRun
     }
-
+	fmt.Println("****************googleCode验证通过:", googleCode)
     ac = models.GetAccountByUid(u.MerchantUid)
-    matched, msg = verifyAccountAndMoney(bankCode, accountName, cardNo, bankAccountType, province, city,
-        bankAccountAddress, moblieNo, money, ac)
+    matched, msg = verifyAccountAndMoney(bankCode, accountName, cardNo, money, ac)
     if !matched {
         goto stopRun
     }
@@ -239,9 +243,28 @@ func (c *Withdraw) LaunchSingleWithdraw() {
         goto stopRun
     }
 
-    amount, _ = strconv.ParseFloat(money, 10)
+
     sett = models.PayforInfo{
-        // ... 其他代码保持不变 ...
+		PayforUid:          "pppp" + xid.New().String(),
+		MerchantUid:        u.MerchantUid,
+		MerchantName:       u.MerchantName,
+// 		PhoneNo:            u.AgentPhone,
+ 		MerchantOrderId:    xid.New().String(),
+ 		BankOrderId:        "4444" + xid.New().String(),
+// 		PayforFee:          common.PAYFOR_FEE,
+// 		Type:               common.SELF_MERCHANT,
+		PayforAmount:       amount,
+		PayforTotalAmount:  amount,
+		BankCode:           bankCode,
+		BankName:           enum.GetBankInfo()[bankCode],
+// 		IsSend:             common.NO,
+		BankAccountName:    accountName,
+		BankAccountNo:      cardNo,
+// 		BankAccountType:    bankAccountType,
+// 		BankAccountAddress: province + city + bankAccountAddress,
+ 		Status:             conf.PAYFOR_COMFRIM,
+		CreateTime:         pubMethod.GetNowTime(),
+		UpdateTime:         pubMethod.GetNowTime(),
     }
 
     matched = models.InsertPayfor(sett)
@@ -255,6 +278,20 @@ stopRun:
     c.Data["json"] = pubMethod.JsonFormat(flag, "", msg, url)
     c.ServeJSON()
     c.StopRun()
+}
+
+// VerifyGoogleCode 验证 Google Authenticator 代码
+func verifyGoogleCode(secret, code string) bool {
+    otpConfig := &dgoogauth.OTPConfig{
+        Secret:      secret,
+        WindowSize:  3,
+        HotpCounter: 0,
+    }
+    valid, err := otpConfig.Authenticate(code)
+    if err != nil {
+        return false
+    }
+    return valid
 }
 
 // 提现列表

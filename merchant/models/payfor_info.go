@@ -39,9 +39,9 @@ type PayforInfo struct {
 	BankAccountName    string
 	BankAccountNo      string
 	BankAccountType    string
-	Country            string
-	City               string
-	Ares               string
+// 	Country            string
+// 	City               string
+// 	Ares               string
 	BankAccountAddress string
 	PhoneNo            string
 	GiveType           string
@@ -49,9 +49,9 @@ type PayforInfo struct {
 	NotifyUrl          string
 	Status             string
 	IsSend             string
-	RequestTime        string
-	ResponseTime       string
-	ResponseContext    string
+// 	RequestTime        string
+// 	ResponseTime       string
+// 	ResponseContext    string
 	Remark             string
 	CreateTime         string
 	UpdateTime         string
@@ -196,7 +196,7 @@ func ForUpdatePayFor(payFor PayforInfo) bool {
 				}
 			} else {
 				logs.Error(fmt.Sprintf("商户uid=%s，可用金额不够", payFor.MerchantUid))
-				payFor.ResponseContext = "商户可用余额不足"
+				// payFor.ResponseContext = "商户可用余额不足"
 				payFor.Status = conf.PAYFOR_FAIL
 			}
 		}
