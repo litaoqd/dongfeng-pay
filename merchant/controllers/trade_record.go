@@ -193,7 +193,10 @@ func (c *TradeRecordController) Fetch() {
     start := c.GetString("start")
     end := c.GetString("end")
     status := c.GetString("status")
-        
+    fmt.Println("****************start:", start)
+    fmt.Println("****************end:", end)           
+    fmt.Println("****************status:", status)
+    
     startTimestamp, err := convertToTimestamp(start)
     if err != nil {
         // 处理错误
@@ -203,6 +206,8 @@ func (c *TradeRecordController) Fetch() {
         // 处理错误
     }
 
+    fmt.Println("****************startTimestamp:", startTimestamp)
+    fmt.Println("****************endTimestamp:", endTimestamp)    
     // 获取 token
     token, err := c.GetToken()
     
@@ -245,17 +250,18 @@ func (c *TradeRecordController) Fetch() {
     c.ServeJSON()
 }
 
-func convertToTimestamp(dateStr string) (int64, error) {
-    if dateStr == "" {
+func convertToTimestamp(dateTimeStr string) (int64, error) {
+    if dateTimeStr == "" {
         return 0, nil
     }
-    // 假设日期格式为 "MM/DD/YYYY"
-    layout := "01/02/2006"
-    t, err := time.Parse(layout, dateStr)
+
+    layout := "2006-01-02 15:04:00" // Go 的时间格式化布局
+    t, err := time.Parse(layout, dateTimeStr)
     if err != nil {
         return 0, err
     }
-    return t.UnixNano(), nil // 返回秒级时间戳
+
+    return t.UnixMilli(), nil
 }
 
 

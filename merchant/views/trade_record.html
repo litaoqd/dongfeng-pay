@@ -36,13 +36,18 @@
         width: 120px; /* 调整状态选择框的宽度 */
     }
     
-        .start-time-label {
+    .start-time-label {
         margin-right: 10px; /* 调整标签和输入框之间的间隔 */
+    }
+    .datetime-input {
+        width: 180px; /* 设置日期时间输入框的宽度 */
     }
 
     </style>
     
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
+
 
 </head>
 
@@ -117,11 +122,12 @@
                             <div class="card">
                                 <div class="card-header d-flex align-items-center search-container">
 <div class="d-flex align-items-center search-container">
-    <label  class="start-time-label" for="start">开始时间: </label>
-    <input type="text" id="start" class="form-control mr-3 datepicker date-input" placeholder="开始时间">
-    <label  class="start-time-label" for="end">结束时间: </label>
-    <input type="text" id="end" class="form-control mr-3 datepicker date-input" placeholder="结束时间">
-  
+    <label class="start-time-label" for="datetimeStart">开始时间: </label>
+    <input type="text" id="datetimeStart" class="form-control mr-3 datetime-input" placeholder="开始时间">
+
+    <label class="start-time-label" for="datetimeEnd">结束时间: </label>
+    <input type="text" id="datetimeEnd" class="form-control mr-3 datetime-input" placeholder="结束时间">
+
     <!-- ... 其他元素 ... -->
 </div>
     <select class="form-control mr-3 status-input" id="status">
@@ -151,6 +157,8 @@
 <!-- 在其他 JavaScript 文件之前添加 jQuery 和 jQuery UI 的脚本 -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+
 <script>
 // $(document).ready(function(){
 //     $('.datepicker').datepicker({
@@ -159,33 +167,38 @@
 //     });
 // });
 $(document).ready(function(){
-    var startDateInput = $('#start');
-    var endDateInput = $('#end');
+    var currentDate = new Date();
+    var defaultStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), currentDate.getHours(), currentDate.getMinutes(), 0);
+    var defaultEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), currentDate.getHours(), currentDate.getMinutes(), 0);
 
-    startDateInput.datepicker({
-        format: 'yyyy-mm-dd',
-        autoclose: true,
-        endDate: new Date(), // 可选：限制开始日期最大值为今天
-        onSelect: function(selectedDate) {
-            // 设置结束日期的最小值
-            endDateInput.datepicker('option', 'minDate', selectedDate);
-        }
+    $('#datetimeStart').datetimepicker({
+        format: 'Y-m-d H:i:s',
+        defaultDate: defaultStart,
+        step: 15, // 设置时间间隔为15分钟
+        onShow: function(ct) {
+            this.setOptions({
+                maxDate: $('#datetimeEnd').val() ? $('#datetimeEnd').val() : false
+            })
+        },
+        timepicker: true
     });
 
-    endDateInput.datepicker({
-        format: 'yyyy-mm-dd',
-        autoclose: true,
-        startDate: new Date(), // 可选：限制结束日期最小值为今天
-        onSelect: function(selectedDate) {
-            // 设置开始日期的最大值
-            startDateInput.datepicker('option', 'maxDate', selectedDate);
-        }
+    $('#datetimeEnd').datetimepicker({
+        format: 'Y-m-d H:i:s',
+        defaultDate: defaultEnd,
+        step: 15, // 设置时间间隔为15分钟
+        onShow: function(ct) {
+            this.setOptions({
+                minDate: $('#datetimeStart').val() ? $('#datetimeStart').val() : false
+            })
+        },
+        timepicker: true
     });
 });
 
 function fetchTradeRecords() {
-    var start = $('#start').val();
-    var end = $('#end').val();
+    var start = $('#datetimeStart').val();
+    var end = $('#datetimeEnd').val();
     var status = $('#status').val();
     var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}`;
 
