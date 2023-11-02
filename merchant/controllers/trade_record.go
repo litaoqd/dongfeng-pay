@@ -227,8 +227,19 @@ func (c *TradeRecordController) Fetch() {
 
 	// 构建 API 请求
 // 	apiUrl := fmt.Sprintf("https://api.onepayph.com/api/v1/disburse_order?start=%d&end=%d&status=%s&page_size=3", startTimestamp, endTimestamp, status)
-    apiUrl := fmt.Sprintf("https://api.onepayph.com/api/v1/disburse_order?start=%d&end=%d&status=%s&page_size=3&start_after=%s&end_before=%s", startTimestamp, endTimestamp, status, startAfter, endBefore)
+    // apiUrl := fmt.Sprintf("https://api.onepayph.com/api/v1/disburse_order?start=%d&end=%d&status=%s&page_size=3&start_after=%s&end_before=%s", startTimestamp, endTimestamp, status, startAfter, endBefore)
+    
+    transactionType := c.GetString("transactionType") // 获取交易类型参数
 
+    var apiUrl string
+    if transactionType == "collect" {
+        // 如果是代收
+        apiUrl = fmt.Sprintf("https://api.onepayph.com/api/v1/payment_intent?start=%d&end=%d&status=%s&page_size=20&start_after=%s&end_before=%s", startTimestamp, endTimestamp, status, startAfter, endBefore)
+    } else {
+        // 默认为代付
+        apiUrl = fmt.Sprintf("https://api.onepayph.com/api/v1/disburse_order?start=%d&end=%d&status=%s&page_size=20&start_after=%s&end_before=%s", startTimestamp, endTimestamp, status, startAfter, endBefore)
+    }
+	fmt.Println("****************transactionType:", transactionType)
 	fmt.Println("****************apiUrl:", apiUrl)
 
 	client := &http.Client{}

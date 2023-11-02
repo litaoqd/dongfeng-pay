@@ -74,6 +74,7 @@ let trade = {
         let endTime = $("#endTime").val();
         let payType = $("#payType").val();
         let uStatus = $("#uStatus").val();
+        let transactionType = $("#transactionType").val();
         $.ajax({
             type: "GET",
             url: "/trade/list/",
@@ -85,6 +86,7 @@ let trade = {
                 end: endTime,
                 pay_type: payType,
                 status: uStatus,
+                transactionType: transactionType,
             },
             success: function (data) {
                 trade.show_trade_data(data.root);
@@ -118,6 +120,7 @@ let trade = {
                                 end: endTime,
                                 pay_type: payType,
                                 status: uStatus,
+                                transactionType: transactionType,
                             },
                             success: function (data) {
                                 trade.show_trade_data(data.root)

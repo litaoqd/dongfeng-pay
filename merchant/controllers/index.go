@@ -13,6 +13,8 @@ import (
 	"fmt"
 	"merchant/models"
 	"merchant/sys/enum"
+	"net/http"
+    "io/ioutil"
 )
 
 type Index struct {
@@ -153,4 +155,52 @@ func (c *Index) LoadUserPayWay() {
 	c.Data["json"] = ways
 	c.ServeJSON()
 	c.StopRun()
+}
+
+// GetBalance 处理获取余额的请求
+func (c *Index) GetBalance() {
+    // 获取当前会话中的用户信息
+    us := c.GetSession(enum.UserSession)
+    if us == nil {
+        c.Data["json"] = map[string]string{"error": "User not logged in"}
+        c.ServeJSON()
+        return
+    }
+    u := us.(models.MerchantInfo)
+
+    // 构建 API URL
+    apiUrl := "https://api.onepayph.com/api/v1/balance/" + u.MerchantUid
+
+    // 创建一个新的 HTTP 请求
+    req, err := http.NewRequest("GET", apiUrl, nil)
+    if err != nil {
+        c.Data["json"] = map[string]string{"error": "Failed to create request"}
+        c.ServeJSON()
+        return
+    }
+
+    // 添加 Bearer Token 到请求头
+    req.Header.Add("Authorization", "Bearer " + u.MerchantKey)
+
+    // 发送请求
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        c.Data["json"] = map[string]string{"error": "Failed to fetch balance"}
+        c.ServeJSON()
+        return
+    }
+    defer resp.Body.Close()
+
+    // 读取响应体
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        c.Data["json"] = map[string]string{"error": "Failed to read response"}
+        c.ServeJSON()
+        return
+    }
+
+    // 将响应体直接写入到响应中
+    c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
+    c.Ctx.ResponseWriter.Write(body)
 }

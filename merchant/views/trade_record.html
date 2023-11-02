@@ -146,7 +146,7 @@
                             <i class="icon icon-user"></i>
                             账户管理
                         </a>
-                        <ul id="exampledropdownDropdown" class="list-unstyled ">
+                        <ul id="exampledropdownDropdown" class="collapse list-unstyled ">
                             <li>
                                 <a href="/user_info/show_modify_ui">修改密码</a>
                             </li>
@@ -163,7 +163,7 @@
                             <i class="icon icon-presentation"></i>
                             订单管理
                         </a>
-                        <ul id="exampledropdownDropdown1" class="collapse list-unstyled ">
+                        <ul id="exampledropdownDropdown1" class="list-unstyled ">
                             <li>
                                 <a href="/query_order/ui">查询订单</a>
                             </li>
@@ -224,7 +224,13 @@
                                             <input type="text" id="datetimeEnd" class="form-control mr-3 datetime-input"
                                                 placeholder="结束时间">
                                             <!-- ... 其他元素 ... -->
+                                            <label class="start-time-label" for="transactionType">交易类型:</label>
+                                            <select class="form-control mr-3 status-input" id="transactionType">
+                                                <option value="disburse">代付</option>
+                                                <option value="collect">代收</option>
+                                            </select>
                                         </div>
+
                                         <select class="form-control mr-3 status-input" id="status">
                                             <option value="">全部状态</option>
                                             <option value="processing">处理中</option>

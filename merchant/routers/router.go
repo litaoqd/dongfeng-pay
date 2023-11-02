@@ -46,7 +46,8 @@ func init() {
 	
 	beego.Router("/query_order/ui", &controllers.QueryOrderController{}, "*:ShowUI")
 	beego.Router("/query_order/search", &controllers.QueryOrderController{}, "get:SearchOrder")
-
+	
+	beego.Router("/index/get_balance", &controllers.Index{}, "get:GetBalance")
 
 	beego.Router("/user_info/show_modify_ui", &controllers.UserInfo{}, "*:ShowModifyUserInfoUI")
 	beego.Router("/user_info/modify_userInfo/?:params", &controllers.UserInfo{}, "*:ModifyUserInfo")
