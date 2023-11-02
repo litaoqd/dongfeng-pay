@@ -224,13 +224,18 @@
                                             <input type="text" id="datetimeEnd" class="form-control mr-3 datetime-input"
                                                 placeholder="结束时间">
                                             <!-- ... 其他元素 ... -->
-                                            <label class="start-time-label" for="transactionType">交易类型:</label>
-                                            <select class="form-control mr-3 status-input" id="transactionType">
-                                                <option value="disburse">代付</option>
-                                                <option value="collect">代收</option>
-                                            </select>
+                                            <!--<label class="start-time-label" for="transactionType">交易类型:</label>-->
+                                            <!--<select class="form-control mr-3 status-input" id="transactionType">-->
+                                            <!--    <option value="disburse">代付</option>-->
+                                            <!--    <option value="collect">代收</option>-->
+                                            <!--</select>-->
                                         </div>
-
+                                        <label class="start-time-label" for="transactionType">交易类型:</label>
+                                        <select class="form-control mr-3 status-input" id="transactionType">
+                                                 <option value="collect">代收</option>
+                                                 <option value="disburse">代付</option>
+                                            <!-- ... 其他状态 ... -->
+                                        </select>
                                         <select class="form-control mr-3 status-input" id="status">
                                             <option value="">全部状态</option>
                                             <option value="processing">处理中</option>
@@ -331,9 +336,10 @@
             var start = $('#datetimeStart').val();
             var end = $('#datetimeEnd').val();
             var status = $('#status').val();
+            var transactionType = $('#transactionType').val();
             // var pageSize = 2; // 根据需要调整
             // var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}&page_size=${pageSize}&start_after=${startAfter}&end_before=${endBefore}`;
-            var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}&start_after=${startAfter}&end_before=${endBefore}`;
+            var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}&start_after=${startAfter}&end_before=${endBefore}&transactionType=${transactionType}`;
 
             fetch(apiUrl)
                 .then(response => {

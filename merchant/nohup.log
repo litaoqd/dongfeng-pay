@@ -1,0 +1,58 @@
+nohup: ignoring input
+2023/11/03 05:43:52.556 [1;34m[I][0m [init.go:28]  mysql init..... unipay:GhCkJjCede3LK2nT@tcp(localhost:3306)/unipay?charset=utf8
+
+2023/11/03 05:43:52.571 [1;32m[N][0m  %s
+
+2023/11/03 05:43:53.129 [1;34m[I][0m [parser.go:413]  generate router from comments
+
+2023/11/03 05:43:53.130 [1;34m[I][0m [server.go:241]  http server Running on http://:8080
+
+2023/11/03 05:44:08.817 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[90;47m 302 [0m|     173.27µs|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 05:44:09.010 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|   1.329645ms|   match|[97;44m GET     [0m /     r:/
+
+2023/11/03 05:44:16.690 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[90;47m 302 [0m|     100.47µs|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 05:44:16.877 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|   1.274341ms|   match|[97;44m GET     [0m /     r:/
+
+2023/11/03 05:44:31.415 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|   1.210826ms|   match|[97;44m GET     [0m /query_order/ui   r:/query_order/ui
+
+2023/11/03 05:44:31.626 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[90;47m 304 [0m|    541.493µs|   match|[97;44m GET     [0m /static/js/index.js
+
+2023/11/03 05:44:31.828 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[90;47m 302 [0m|     85.795µs|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 05:44:32.020 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|   1.202678ms|   match|[97;44m GET     [0m /     r:/
+
+2023/11/03 05:44:33.019 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|    1.19984ms|   match|[97;44m GET     [0m /query_order/ui   r:/query_order/ui
+
+2023/11/03 05:44:33.248 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[90;47m 302 [0m|     51.673µs|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 05:44:33.439 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|    871.474µs|   match|[97;44m GET     [0m /     r:/
+
+2023/11/03 05:44:34.086 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|   1.296974ms|   match|[97;44m GET     [0m /query_order/ui   r:/query_order/ui
+
+2023/11/03 05:44:34.319 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[90;47m 302 [0m|     63.891µs|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 05:44:34.509 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|   1.175152ms|   match|[97;44m GET     [0m /     r:/
+
+2023/11/03 05:44:34.912 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|   1.474456ms|   match|[97;44m GET     [0m /query_order/ui   r:/query_order/ui
+
+2023/11/03 05:44:35.144 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[90;47m 302 [0m|     67.726µs|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 05:44:35.334 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|   1.184414ms|   match|[97;44m GET     [0m /     r:/
+
+2023/11/03 05:44:36.305 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[90;47m 302 [0m|     81.056µs|   match|[97;44m GET     [0m /index/ui/   r:/index/ui/
+
+2023/11/03 05:44:36.498 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|   1.001075ms|   match|[97;44m GET     [0m /     r:/
+
+[ORM]2023/11/03 05:44:53  -[Queries/default] - [  OK /    db.Query /     2.0ms] - [SELECT T0.`id`, T0.`status`, T0.`belong_agent_uid`, T0.`belong_agent_name`, T0.`merchant_name`, T0.`merchant_uid`, T0.`merchant_key`, T0.`merchant_secret`, T0.`login_password`, T0.`login_account`, T0.`auto_settle`, T0.`auto_pay_for`, T0.`white_ips`, T0.`remark`, T0.`single_pay_for_road_uid`, T0.`single_pay_for_road_name`, T0.`roll_pay_for_road_code`, T0.`roll_pay_for_road_name`, T0.`payfor_fee`, T0.`update_time`, T0.`create_time` FROM `merchant_info` T0 WHERE T0.`login_account` = ? LIMIT 1] - `13911068888`
+Merchant Key: 2FMMMNEVLCJJE6YW
+dynamicCode: 042353
+2023/11/03 05:44:53.348 [1;32m[N][0m  %s
+
+2023/11/03 05:44:53.562 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|   1.130305ms|   match|[97;44m GET     [0m /index/ui/   r:/index/ui/
+
+2023/11/03 05:44:53.798 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[90;47m 304 [0m|     76.075µs|   match|[97;44m GET     [0m /static/js/index.js
+
+2023/11/03 05:44:54.056 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|  62.650192ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+

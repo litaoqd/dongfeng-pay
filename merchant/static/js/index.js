@@ -95,6 +95,7 @@ let index = {
                 // 更新账户余额和押款金额
                 $("#balanceAmt").text(response.cash_balance);
                 $("#amountFrozen").text(response.receivable_balance);
+                $("#balance").val(response.cash_balance);
                 console.log("Balance Amount: ", response.cash_balance);
                 console.log("Amount Frozen: ", response.receivable_balance);
             },
