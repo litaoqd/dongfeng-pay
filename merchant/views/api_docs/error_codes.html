@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>错误码说明</title>
+    <link rel="stylesheet" href="/static/css/apidoc.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+    <div class="container">
+        <div class="header">错误码定义</div>
+
+        <div class="section-header">3.1 HTTP状态码汇总</div>
+        <table class="error-table">
+            <thead>
+                <tr>
+                    <th>HTTP Code</th>
+                    <th>表达的含义</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>200</td><td>请求处理成功</td></tr>
+                <tr><td>201</td><td>创建成功</td></tr>
+                <tr><td>400</td><td>无效请求，缺少关键的参数</td></tr>
+                <tr><td>401</td><td>鉴权校验失败</td></tr>
+                <tr><td>403</td><td>权限不满足，可能因为业务未开通</td></tr>
+                <tr><td>404</td><td>请求的资源不存在，比如发起退款时对应的支付记录不存在</td></tr>
+                <tr><td>409</td><td>用户尝试创建的资源已存在（比如幂等的接口被重复调用）</td></tr>
+                <tr><td>429</td><td>重复的请求过于频繁</td></tr>
+                <tr><td>500</td><td>服务器未知错误</td></tr>
+            </tbody>
+        </table>
+
+        <div class="section-header">3.2 消息体的错误码</div>
+        <table class="error-table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>表达的含义</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>authorization_failed</td><td>鉴权失败</td></tr>
+                <tr><td>sign_validate_failed</td><td>验签失败</td></tr>
+                <tr><td>no_privilege</td><td>对访问的资源没有权限</td></tr>
+                <tr><td>unsupported_payment_method</td><td>支付方式类型未开通或者不支持的支付方式</td></tr>
+                <tr><td>balance_insufficient</td><td>代付时余额不足</td></tr>
+                <tr><td>transaction_expired</td><td>交易超时</td></tr>
+                <tr><td>invalid_bank_account_no</td><td>无效的银行账户号</td></tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            © 2023 OnePay. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>接口约定</title>
+    <link rel="stylesheet" href="/static/css/apidoc.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+    <div class="container">
+        <div class="header">接口约定</div>
+
+        <div class="section-header">2.1 通用参数</div>
+        <table class="convention-table">
+            <thead>
+                <tr>
+                    <th>字段</th>
+                    <th>命名规则</th>
+                    <th>取值规则</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>币种</td>
+                    <td>以currency结尾</td>
+                    <td>币种编码遵照ISO4217，用Alphabetic Code，都用小写字母，长度为3</td>
+                </tr>
+                <tr>
+                    <td>金额</td>
+                    <td>以amount结尾</td>
+                    <td>基于基本货币单位的金额，精确到小数点后两位</td>
+                </tr>
+                <tr>
+                    <td>时间</td>
+                    <td>以at结尾</td>
+                    <td>UTC时间，精确到毫秒</td>
+                </tr>
+                <tr>
+                    <td>比率</td>
+                    <td>以rate结尾</td>
+                    <td>表达百分比，去掉百分号的数字部分，具体精确到小数点后的位数，在具体字段里说明</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-header">2.2 应答消息</div>
+        <p>API采用RESTful风格，应答消息中，用http status code表示请求的处理情况，如果是成功，则为200，消息体为具体业务对象；如果是失败，不同的status code表达不同的失败原因分类，在消息体中，用code表达具体错误码，message表达详细错误原因。</p>
+        <div class="json-block">
+            {
+                "code": "payment_method_unsupported",  // 字符串形式，易读的错误码
+                "message": "CoinsPay was closed"       // 更具体的错误信息，可能会带上链接到商户dashboard的详细说明的url
+            }
+        </div>
+
+        <div class="footer">
+            © 2023 OnePay. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

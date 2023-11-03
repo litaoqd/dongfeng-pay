@@ -1,0 +1,1411 @@
+<h1><strong>OpenPay API Reference</strong></h1>
+<p style="font-weight: 400;">&nbsp;</p>
+<h1><strong>1&nbsp;</strong><strong><strong>修订记录</strong></strong></h1>
+<table>
+<tbody>
+<tr>
+<td width="159">
+<p><strong>修改内容</strong></p>
+</td>
+<td width="165">
+<p><strong>修改原因</strong></p>
+</td>
+<td width="79">
+<p><strong>修改时间</strong></p>
+</td>
+</tr>
+<tr>
+<td width="159">
+<p>创建文档</p>
+</td>
+<td width="165">
+<p>新建</p>
+</td>
+<td width="79">
+<p>2023-10-11</p>
+</td>
+</tr>
+<tr>
+<td width="159">
+<p>修复payment_intent和disburse的create接口中channel和fund_channel的枚举值</p>
+</td>
+<td width="165">
+<p>调整渠道的枚举定义</p>
+</td>
+<td width="79">
+<p>2023-10-17</p>
+</td>
+</tr>
+<tr>
+<td width="159">
+<p>补充支付和代付查询列表接口的说明；补充回调通知的说明</p>
+</td>
+<td width="165">
+<p>查询列表的接口之前没有明确有介绍</p>
+</td>
+<td width="79">
+<p>2023-10-18</p>
+</td>
+</tr>
+<tr>
+<td width="159">
+<p>去掉代付目标银行账号需要RSA加密的要求</p>
+</td>
+<td width="165">
+<p>用处不大，反而增加对接复杂度</p>
+</td>
+<td width="79">
+<p>2023-10-18</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h1><strong>2&nbsp;</strong><strong><strong>一些约定</strong></strong></h1>
+<h2><strong>2.1&nbsp;</strong><strong><strong>通用参数</strong></strong></h2>
+<table>
+<tbody>
+<tr>
+<td width="60">
+<p><strong>字段</strong></p>
+</td>
+<td width="102">
+<p><strong>命名规则</strong></p>
+</td>
+<td width="251">
+<p><strong>取值规则</strong></p>
+</td>
+</tr>
+<tr>
+<td width="60">
+<p>币种</p>
+</td>
+<td width="102">
+<p>以currency结尾</p>
+</td>
+<td width="251">
+<p>币种编码遵照<a href="#QuUYdWG4EouoosxiENQcbaWTnsd">ISO4217</a>，用Alphabetic Code，都用小写字母，长度为3</p>
+</td>
+</tr>
+<tr>
+<td width="60">
+<p>金额</p>
+</td>
+<td width="102">
+<p>以amount结尾</p>
+</td>
+<td width="251">
+<p>基于基本货币单位的金额，精确到小数点后两位</p>
+</td>
+</tr>
+<tr>
+<td width="60">
+<p>时间</p>
+</td>
+<td width="102">
+<p>以at结尾</p>
+</td>
+<td width="251">
+<p>UTC时间，精确到毫秒</p>
+</td>
+</tr>
+<tr>
+<td width="60">
+<p>比率</p>
+</td>
+<td width="102">
+<p>以rate结尾</p>
+</td>
+<td width="251">
+<p>表达百分比，去掉百分号的数字部分，具体精确到小数点后的位数，在具体字段里说明</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h2><strong>2.2&nbsp;</strong><strong><strong>应答消息</strong></strong></h2>
+<p style="font-weight: 400;">API采用RESTful风格，应答消息中，用http status code表示请求的处理情况，如果是成功，则为200，消息体为具体业务对象；如果是失败，不同的status code表达不同的失败原因分类，在消息体中，用code表达具体错误码，message表达详细错误原因</p>
+<table>
+<tbody>
+<tr>
+<td width="414">
+<p>{<br />&nbsp;&nbsp;&nbsp;"code": "payment_method_unsupported" &nbsp;//字符串形式，易读的错误码<br />&nbsp;&nbsp;&nbsp;"message": "CoinsPay was closed" &nbsp;&nbsp;&nbsp;&nbsp;//更具体的错误信息，可能会带上链接到商户dashboard的详细说明的url<br />}</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h1><strong>3&nbsp;</strong><strong><strong>错误码定义</strong></strong></h1>
+<p style="font-weight: 400;">OnePay采用HTTP 应答的status code表示API请求的成功或失败，这样方便运维层和业务层的分级监控。具体的错误信息在消息体中表示，并且，OnePay放弃了常用的数字表达的错误码，而采用更加易读的字符串形式的错误码。</p>
+<h2><strong>3.1&nbsp;</strong><strong><strong>H</strong></strong><strong><strong>TTP</strong></strong><strong><strong>状态码汇总</strong></strong></h2>
+<table>
+<tbody>
+<tr>
+<td width="75">
+<p><strong>HTTP</strong>&nbsp;<strong>Code</strong></p>
+</td>
+<td width="308">
+<p><strong>表达的含义</strong></p>
+</td>
+</tr>
+<tr>
+<td width="75">
+<p>200</p>
+</td>
+<td width="308">
+<p>请求处理成功</p>
+</td>
+</tr>
+<tr>
+<td width="75">
+<p>201</p>
+</td>
+<td width="308">
+<p>创建成功</p>
+</td>
+</tr>
+<tr>
+<td width="75">
+<p>400</p>
+</td>
+<td width="308">
+<p>无效请求，缺少关键的参数</p>
+</td>
+</tr>
+<tr>
+<td width="75">
+<p>401</p>
+</td>
+<td width="308">
+<p>鉴权校验失败</p>
+</td>
+</tr>
+<tr>
+<td width="75">
+<p>403</p>
+</td>
+<td width="308">
+<p>权限不满足，可能因为业务未开通</p>
+</td>
+</tr>
+<tr>
+<td width="75">
+<p>404</p>
+</td>
+<td width="308">
+<p>请求的资源不存在，比如发起退款时对应的支付记录不存在</p>
+</td>
+</tr>
+<tr>
+<td width="75">
+<p>409</p>
+</td>
+<td width="308">
+<p>用户尝试创建的资源已存在（比如幂等的接口被重复调用）</p>
+</td>
+</tr>
+<tr>
+<td width="75">
+<p>429</p>
+</td>
+<td width="308">
+<p>重复的请求过于频繁</p>
+</td>
+</tr>
+<tr>
+<td width="75">
+<p>500</p>
+</td>
+<td width="308">
+<p>服务器未知错误</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h2><strong>3.2&nbsp;</strong><strong><strong>消息</strong></strong><strong><strong>体</strong></strong><strong><strong>的错误码</strong></strong></h2>
+<table>
+<tbody>
+<tr>
+<td width="170">
+<p><strong>Code</strong></p>
+</td>
+<td width="243">
+<p><strong>表达的含义</strong></p>
+</td>
+</tr>
+<tr>
+<td width="170">
+<p>authorization_failed</p>
+</td>
+<td width="243">
+<p>鉴权失败</p>
+</td>
+</tr>
+<tr>
+<td width="170">
+<p>sign_validate_failed</p>
+</td>
+<td width="243">
+<p>验签失败</p>
+</td>
+</tr>
+<tr>
+<td width="170">
+<p>no_privilege</p>
+</td>
+<td width="243">
+<p>对访问的资源没有权限</p>
+</td>
+</tr>
+<tr>
+<td width="170">
+<p>unsupported_payment_method</p>
+</td>
+<td width="243">
+<p>支付方式类型未开通或者不支持的支付方式</p>
+</td>
+</tr>
+<tr>
+<td width="170">
+<p>balance_insufficient</p>
+</td>
+<td width="243">
+<p>代付时余额不足</p>
+</td>
+</tr>
+<tr>
+<td width="170">
+<p>transaction_expired</p>
+</td>
+<td width="243">
+<p>交易超时</p>
+</td>
+</tr>
+<tr>
+<td width="170">
+<p>invalid_bank_account_no</p>
+</td>
+<td width="243">
+<p>无效的银行账户号</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h1><strong>4&nbsp;</strong><strong><strong>鉴权</strong></strong></h1>
+<p style="font-weight: 400;">对商户发起交易请求，采用bearer token的方式鉴权。Onepay会分配给客户secret key，不同环境secret key串会是：sk_test_xxxxxxx和sk_prd_xxxxx</p>
+<p style="font-weight: 400;">注：为了给客户对接和测试接口时提供更好的易用性。我们对交易请求并没有采用HMAC的鉴权方式，参考Stripe API采用了bearer token的认证方式。通过https完全可以防消息篡改，此外也有IP白名单机制做防护。</p>
+<h1><strong>5&nbsp;</strong><strong><strong>A</strong></strong><strong><strong>PI</strong></strong><strong><strong>列表</strong></strong></h1>
+<h2><strong>5.1&nbsp;</strong><strong><strong>支付</strong></strong></h2>
+<h3><strong>5.1.1&nbsp;</strong><strong><strong>支付</strong></strong><strong><strong>订单</strong></strong><strong><strong>(PaymentIntent)</strong></strong></h3>
+<p style="font-weight: 400;">标记required的字段表示在请求时必须有</p>
+<table>
+<tbody>
+<tr>
+<td colspan="5" width="240">
+<p><strong>字段名</strong></p>
+</td>
+<td width="105">
+<p><strong>说明</strong></p>
+</td>
+<td width="67">
+<p><strong>类型</strong></p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>id</p>
+</td>
+<td width="105">
+<p>支付订单号，py_xxxxxxx</p>
+</td>
+<td width="67">
+<p>string</p>
+<p>&nbsp;</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>account_id</p>
+</td>
+<td width="105">
+<p>商户账户ID</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>ref_trade_id</p>
+<p>required</p>
+</td>
+<td width="105">
+<p>关联的商户侧交易ID</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>amount</p>
+<p>required</p>
+</td>
+<td width="105">
+<p>支付金额，基于常用单位</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>currency</p>
+<p>required</p>
+</td>
+<td width="105">
+<p>支付币种</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>fee_amount</p>
+</td>
+<td width="105">
+<p>手续费金额，基于常用单位</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>exchange_rate</p>
+<p>&nbsp;</p>
+</td>
+<td width="105">
+<p>汇率，买入结算币种单位金额需要的支付币种的金额</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>status</p>
+<p>&nbsp;</p>
+</td>
+<td width="105">
+<p>订单状态，包含以下值：</p>
+<p>processing 表示支付发起成功，未完成支付扣款</p>
+<p>succeeded 表示支付成功</p>
+<p>failed 支付发起失败或者支付失败</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>payment_method</p>
+<p>required</p>
+</td>
+<td width="105">
+<p>&nbsp;</p>
+</td>
+<td width="67">
+<p>object</p>
+</td>
+</tr>
+<tr>
+<td rowspan="17" width="83">
+<p>&nbsp;</p>
+</td>
+<td colspan="4" width="157">
+<p>type</p>
+<p>required</p>
+<p>&nbsp;</p>
+</td>
+<td width="105">
+<p>支付方式类型：</p>
+<p>card</p>
+<p>direct_debit</p>
+</td>
+<td width="67">
+<p>string</p>
+<p>&nbsp;</p>
+</td>
+</tr>
+<tr>
+<td colspan="4" width="157">
+<p>direct_debit</p>
+</td>
+<td width="105">
+<p>如果type为direct_debit，则此项为必须</p>
+</td>
+<td width="67">
+<p>object</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" width="78">
+<p>&nbsp;</p>
+</td>
+<td colspan="2" width="78">
+<p>channel</p>
+</td>
+<td width="105">
+<p>jcpay_qrcode</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="4" width="157">
+<p>card</p>
+</td>
+<td width="105">
+<p>如果type为card，则此项为必须</p>
+</td>
+<td width="67">
+<p>object</p>
+</td>
+</tr>
+<tr>
+<td rowspan="2" width="52">
+<p>&nbsp;</p>
+</td>
+<td colspan="3" width="105">
+<p>brand</p>
+<p>&nbsp;</p>
+</td>
+<td width="105">
+<p>卡品牌</p>
+<p>mastercard</p>
+<p>unionpay</p>
+<p>visa</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="3" width="105">
+<p>country</p>
+</td>
+<td width="105">
+<p>卡所属国家</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="4" width="157">
+<p>billing_details</p>
+</td>
+<td width="105">
+<p>账单明细</p>
+</td>
+<td width="67">
+<p>object</p>
+</td>
+</tr>
+<tr>
+<td rowspan="10" width="52">
+<p>&nbsp;</p>
+</td>
+<td colspan="3" width="105">
+<p>address</p>
+</td>
+<td width="105">
+<p>账单地址</p>
+</td>
+<td width="67">
+<p>object</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" rowspan="6" width="52">
+<p>&nbsp;</p>
+</td>
+<td width="52">
+<p>city</p>
+</td>
+<td width="105">
+<p>城市</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="52">
+<p>country</p>
+</td>
+<td width="105">
+<p>国家</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="52">
+<p>line1</p>
+</td>
+<td width="105">
+<p>街道、公司名等</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="52">
+<p>line2</p>
+</td>
+<td width="105">
+<p>单元、楼号等</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="52">
+<p>postal_code</p>
+</td>
+<td width="105">
+<p>邮政编码</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="52">
+<p>state</p>
+</td>
+<td width="105">
+<p>州或省</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="3" width="105">
+<p>email</p>
+</td>
+<td width="105">
+<p>卡持有者邮箱</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="3" width="105">
+<p>name</p>
+</td>
+<td width="105">
+<p>卡持有者姓名</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="3" width="105">
+<p>phone</p>
+</td>
+<td width="105">
+<p>卡持有者电话</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>customer</p>
+</td>
+<td width="105">
+<p>支付用户信息</p>
+</td>
+<td width="67">
+<p>object</p>
+</td>
+</tr>
+<tr>
+<td width="83">
+<p>&nbsp;</p>
+</td>
+<td colspan="4" width="157">
+<p>first_name</p>
+</td>
+<td width="105">
+<p>&nbsp;</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="83">
+<p>&nbsp;</p>
+</td>
+<td colspan="4" width="157">
+<p>mid_name</p>
+</td>
+<td width="105">
+<p>&nbsp;</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="83">
+<p>&nbsp;</p>
+</td>
+<td colspan="4" width="157">
+<p>last_name</p>
+</td>
+<td width="105">
+<p>&nbsp;</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="83">
+<p>&nbsp;</p>
+</td>
+<td colspan="4" width="157">
+<p>email</p>
+</td>
+<td width="105">
+<p>&nbsp;</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="83">
+<p>&nbsp;</p>
+</td>
+<td colspan="4" width="157">
+<p>phone</p>
+</td>
+<td width="105">
+<p>&nbsp;</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="83">
+<p>&nbsp;</p>
+</td>
+<td colspan="4" width="157">
+<p>ip</p>
+</td>
+<td width="105">
+<p>&nbsp;</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td rowspan="7" width="83">
+<p>&nbsp;</p>
+</td>
+<td colspan="4" width="157">
+<p>address</p>
+</td>
+<td width="105">
+<p>地址信息</p>
+</td>
+<td width="67">
+<p>object</p>
+</td>
+</tr>
+<tr>
+<td rowspan="6" width="52">
+<p>&nbsp;</p>
+</td>
+<td colspan="3" width="105">
+<p>city</p>
+</td>
+<td width="105">
+<p>城市</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="3" width="105">
+<p>country</p>
+</td>
+<td width="105">
+<p>国家</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="3" width="105">
+<p>line1</p>
+</td>
+<td width="105">
+<p>街道、公司名等</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="3" width="105">
+<p>line2</p>
+</td>
+<td width="105">
+<p>单元、楼号等</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="3" width="105">
+<p>postal_code</p>
+</td>
+<td width="105">
+<p>邮政编码</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="3" width="105">
+<p>state</p>
+</td>
+<td width="105">
+<p>州或省</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>available_on</p>
+</td>
+<td width="105">
+<p>资金到账时间</p>
+</td>
+<td width="67">
+<p>UTC time</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>Description</p>
+<p>required</p>
+</td>
+<td width="105">
+<p>因为什么而支付的描述信息</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>metadata</p>
+</td>
+<td width="105">
+<p>请求附带的信息</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>return_url</p>
+</td>
+<td width="105">
+<p>返回URL，信用卡支付涉及3DS会用到</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>callback_url</p>
+</td>
+<td width="105">
+<p>回调URL，如果请求时传了，则使用请求消息中的，否则用配置的callback url</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>fail_reason</p>
+</td>
+<td width="105">
+<p>失败原因</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td colspan="5" width="240">
+<p>trans_at</p>
+</td>
+<td width="105">
+<p>下单时间</p>
+</td>
+<td width="67">
+<p>timestamp</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p style="font-weight: 400;">&nbsp;</p>
+<h3><strong>5.1.2&nbsp;</strong><strong><strong>创建支付订单</strong></strong></h3>
+<table>
+<tbody>
+<tr>
+<td width="414">
+<p>POST&nbsp;/api/v1/payment_intent</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p style="font-weight: 400;">&nbsp;</p>
+<h4><strong>5.1.2.1&nbsp;</strong><strong><strong>请求示例</strong></strong></h4>
+<p style="font-weight: 400;">{</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"ref_trade_id": "商家订单的ID",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"amount": "10.00",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"currency": "php",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"customer": {</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"first_name": "wowo",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"last_name": "totot",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"email": "wwwd@sina.com"</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;},</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"payment_method": {</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"type": "direct_debit",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"direct_debit": {</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"channel":"jcpay_qrcode"</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;},</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"description": "AbC"</p>
+<p style="font-weight: 400;">}</p>
+<p style="font-weight: 400;">&nbsp;</p>
+<h3><strong>5.1.3&nbsp;</strong><strong><strong>获取一个支付订单</strong></strong></h3>
+<table>
+<tbody>
+<tr>
+<td width="414">
+<p>GET /api/v1/payment_intent/{payment_intent_id}</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p style="font-weight: 400;">&nbsp;</p>
+<h3><strong>5.1.4&nbsp;</strong><strong><strong>基于商户订单号获取支付订单</strong></strong></h3>
+<table>
+<tbody>
+<tr>
+<td width="414">
+<p>GET /api/v1/payment_intent/ref_trade_id/{ref_trade_id}</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p style="font-weight: 400;">&nbsp;</p>
+<h3><strong>5.1.5&nbsp;</strong><strong><strong>查询</strong></strong><strong><strong>支付订单列表</strong></strong></h3>
+<table>
+<tbody>
+<tr>
+<td width="414">
+<p>GET /api/v1/payment_intent</p>
+<p>参数有：</p>
+<p>-&nbsp;start, end: 交易时间范围的起止时间，取值为时间戳。可以不传值，也可以只给一个参数传值。</p>
+<p>-&nbsp;status: 按这个订单状态值查询订单。</p>
+<p>-&nbsp;sort_type: desc/asc ,表示按交易时间倒序还是正序排序查询结果。如果不传，默认为倒序。</p>
+<p>-&nbsp;page_size：每页的记录数，默认为10条，最大30条。</p>
+<p>-&nbsp;start_after：查询某条记录之后的一页。每次查询返回的start_after对应的是当页最后一条记录，把返回消息中的start_after值作为参数再次查询，则可以查到下一页的记录，has_more表示是否还有下一页。</p>
+<p>-&nbsp;end_before：查询某条记录之前的一页。每次查询返回的end_before对应的是当页第一条记录，把返回消息中的end_before值作为参数再次查询，则可以查到前一页的记录，如果返回结果中end_before有值有表示还有前一页。</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p style="font-weight: 400;">&nbsp;</p>
+<p style="font-weight: 400;">返回信息示例如下：</p>
+<p style="font-weight: 400;">{</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"has_more": <strong><strong>true</strong></strong>,</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"sort_type": "desc",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"page_size": 2,</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"start_after": "eyJzdGFydF9hZnRlciI6InB5XzJXblY4S01DMXZNSkRDM1Iwbk00TVFyOWF6diIsImVuZF9iZWZvcmUiOiIiLCJwYWdlX3NpemUiOjMsInBhZ2luZ190aW1lIjoxNjk3NTk4ODk2MTU1fQ==",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"data": [</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id": "py_2WnasXLyGvk3NvwXAyw7aXD2iDF",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"account_id": "acct_juancash",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"ref_trade_id": "391",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"amount": "10.00",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"currency": "php",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"fee_amount": "0.38",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"exchange_rate": "0",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"description": "AbC",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"customer": {</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"first_name": "wowo",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"last_name": "totot"</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"trans_at": "1697370998000",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"status": "succeeded",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"object": "payment_order"</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id": "py_2WnV8KMC1vMJDC3R0nM4MQr9azv",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"account_id": "acct_juancash",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"ref_trade_id": "390",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"amount": "10.00",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"currency": "php",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"fee_amount": "0.38",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"exchange_rate": "0",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"description": "AbC",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"customer": {</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"first_name": "wowo",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"last_name": "totot"</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"trans_at": "1697368120000",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"status": "succeeded",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"object": "payment_order"</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;]</p>
+<p style="font-weight: 400;">}</p>
+<h2><strong>5.2&nbsp;</strong><strong><strong>代付</strong></strong></h2>
+<h3><strong>5.2.1&nbsp;</strong><strong><strong>代付订单</strong></strong><strong><strong>(</strong></strong><strong><strong>Di</strong></strong><strong><strong>sburseOrder)</strong></strong></h3>
+<p style="font-weight: 400;">标记required的字段表示在请求时必须有</p>
+<table>
+<tbody>
+<tr>
+<td width="240">
+<p><strong>字段名</strong></p>
+</td>
+<td width="105">
+<p><strong>说明</strong></p>
+</td>
+<td width="67">
+<p><strong>类型</strong></p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>id</p>
+</td>
+<td width="105">
+<p>支付订单号，dib_xxxxxxx</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>account_id</p>
+</td>
+<td width="105">
+<p>商户账户ID</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>ref_trade_id</p>
+<p>required</p>
+</td>
+<td width="105">
+<p>关联的商户侧交易ID</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>amount</p>
+<p>required</p>
+</td>
+<td width="105">
+<p>支付金额，基于常用单位</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>currency</p>
+<p>required</p>
+</td>
+<td width="105">
+<p>支付币种</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>fee_amount</p>
+</td>
+<td width="105">
+<p>手续费金额，基于常用单位</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>status</p>
+<p>&nbsp;</p>
+</td>
+<td width="105">
+<p>订单状态，包含以下值：</p>
+<p>processing 处理中，代付发起成功，资金在途</p>
+<p>succeeded 代付成功</p>
+<p>failed 代付发起失败或代付处理失败</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>fund_channel</p>
+<p>required</p>
+</td>
+<td width="105">
+<p>代付资金渠道类型：</p>
+<p>bdo</p>
+<p>bpi</p>
+<p>rcbc</p>
+<p>union_bank</p>
+<p>gcash</p>
+<p>grab_pay</p>
+<p>paymaya</p>
+</td>
+<td width="67">
+<p>string</p>
+<p>&nbsp;</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>description</p>
+</td>
+<td width="105">
+<p>下单时的描述信息</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>bank_account_no</p>
+<p>required</p>
+</td>
+<td width="105">
+<p>银行账户号</p>
+</td>
+<td width="67">
+<p>String</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>bank_code</p>
+</td>
+<td width="105">
+<p>银行编码</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>bank_account_name</p>
+</td>
+<td width="105">
+<p>银行账户名</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>metadata</p>
+</td>
+<td width="105">
+<p>请求附带的信息</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>fail_reason</p>
+</td>
+<td width="105">
+<p>失败原因</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>callback_url</p>
+</td>
+<td width="105">
+<p>回调URL，如果请求时传了，则使用请求消息中的，否则用配置的callback url</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>fail_reason</p>
+</td>
+<td width="105">
+<p>失败原因</p>
+</td>
+<td width="67">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="240">
+<p>trans_at</p>
+</td>
+<td width="105">
+<p>下单时间</p>
+</td>
+<td width="67">
+<p>timestamp</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p style="font-weight: 400;">&nbsp;</p>
+<h3><strong>5.2.2&nbsp;</strong><strong><strong>创建代付订单</strong></strong></h3>
+<table>
+<tbody>
+<tr>
+<td width="414">
+<p>POST /api/v1/disiburse</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h4><strong>5.2.2.1&nbsp;</strong><strong><strong>请求示例</strong></strong></h4>
+<p style="font-weight: 400;">{</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"ref_trade_id": "商家的订单ID",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"amount": "15.00",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"currency": "php",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"fund_channel": "bpi",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"bank_account_no": "12345678910",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"bank_account_name": "Tim"</p>
+<p style="font-weight: 400;">}</p>
+<h3><strong>5.2.3&nbsp;</strong><strong><strong>获取一个代付订单</strong></strong></h3>
+<table style="font-weight: 400;">
+<tbody>
+<tr>
+<td width="414">
+<p>GET /api/v1/disiburse/{disburse_order_id}</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p style="font-weight: 400;">&nbsp;</p>
+<h3><strong>5.2.4&nbsp;</strong><strong><strong>基于商户订单号获取代付订单</strong></strong></h3>
+<table style="font-weight: 400;">
+<tbody>
+<tr>
+<td width="414">
+<p>GET /api/v1/disiburse/ref_trade_id/{ref_trade_id}</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p style="font-weight: 400;">&nbsp;</p>
+<h3><strong>5.2.5&nbsp;</strong><strong><strong>查询代付订单列表</strong></strong></h3>
+<table>
+<tbody>
+<tr>
+<td width="414">
+<p>GET /api/v1/disiburse/</p>
+<p>//查询参数与查询支付订单列表相同</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p style="font-weight: 400;">&nbsp;</p>
+<p style="font-weight: 400;">返回示例如下：</p>
+<p style="font-weight: 400;">{</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"has_more": <strong><strong>true</strong></strong>,</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"sort_type": "desc",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"page_size": 2,</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"start_after": "eyJzdGFydF9hZnRlciI6ImRpYl8yV3F4Rk5DQ2tWcTRQZmhpWGxwV1NTbmJRZFYiLCJlbmRfYmVmb3JlIjoiIiwicGFnZV9zaXplIjoyLCJwYWdpbmdfdGltZSI6MTY5NzYwMTM5OTIxOH0=",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"data": [</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id": "dib_2Wryu7iYQMx5KIEBaZr3y0fYNmx",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"ref_trade_id": "30007",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"amount": "5.00",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"currency": "php",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"status": "accounted",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"bank_account_name": "taoli",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"bank_account_no": "09087769164",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"account_id": "acct_2WoHFSjAh1eaRpVH72RsOc1OyCw",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"trans_at": "1697503493000",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"object": "disburse_order"</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id": "dib_2WqxFNCCkVq4PfhiXlpWSSnbQdV",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"ref_trade_id": "10030",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"amount": "5.00",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"currency": "php",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"status": "accounted",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"bank_account_name": "taoli",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"bank_account_no": "102280067984",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"account_id": "acct_2WoHFSjAh1eaRpVH72RsOc1OyCw",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"trans_at": "1697473288000",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"object": "disburse_order"</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;]</p>
+<p style="font-weight: 400;">}</p>
+<h2><strong>5.3&nbsp;</strong><strong><strong>余额</strong></strong><strong><strong>(balance)</strong></strong></h2>
+<h3><strong>5.3.1&nbsp;</strong><strong><strong>查询余额</strong></strong></h3>
+<table>
+<tbody>
+<tr>
+<td width="120">
+<p><strong>字段名</strong></p>
+</td>
+<td width="226">
+<p><strong>说明</strong></p>
+</td>
+<td width="127">
+<p><strong>类型</strong></p>
+</td>
+</tr>
+<tr>
+<td width="120">
+<p>receivable_balance</p>
+</td>
+<td width="226">
+<p>商户应收款余额</p>
+</td>
+<td width="127">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="120">
+<p>cash_balance</p>
+</td>
+<td width="226">
+<p>商户可提现或可代付资金总额</p>
+</td>
+<td width="127">
+<p>string</p>
+</td>
+</tr>
+<tr>
+<td width="120">
+<p>In_transit_balance</p>
+</td>
+<td width="226">
+<p>商户在途资金总额</p>
+</td>
+<td width="127">
+<p>string</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p style="font-weight: 400;">&nbsp;</p>
+<p style="font-weight: 400;">应答消息示例：</p>
+<p style="font-weight: 400;">{</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"cash_balance": "53.38",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"in_transit_balance": "30.00",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"receivable_balance": "120.38"</p>
+<p style="font-weight: 400;">}</p>
+<h1><strong>6&nbsp;</strong><strong><strong>回调</strong></strong><strong><strong>通知(webhook</strong></strong><strong><strong>)</strong></strong></h1>
+<p style="font-weight: 400;">不同的交易，在交易完成后，会回调通知商户。消息体为相应交易涉及的业务对象，比如代收的回调通知为PaymentIntent对象（5.1.1），代付的回调通知为DisburseOrder对象（5.2.1）。如果是交易失败了，可以在fail_reason得到失败原因。可以通过返回数据中的object字段区分对象类型进行不同的解析处理。</p>
+<p style="font-weight: 400;">商户可以统一设置回调地址，或者在发送支付或代付请求时传callback_url。</p>
+<p style="font-weight: 400;">回调通知采用采用API signing的鉴权方式，在商户onboarding完成后，会分配给商户accessSecret，不同的accessSecret对应相应的环境：测试环境/生产环境，类似：sk_test_xxxxx 或 sk_prd_xxxxxx。</p>
+<p style="font-weight: 400;">签名方式：</p>
+<p style="font-weight: 400;">payload: timestamp=${timestamp}&amp;body=${body};</p>
+<p style="font-weight: 400;">x-op-signature: 使用accessSecret对payload取HmacSHA256哈希值。</p>
+<p style="font-weight: 400;">请求body的字符串规则：</p>
+<p style="font-weight: 400;">content-type为application/json时，取整个json字符串（目前只考虑application/json的情况）；</p>
+<p style="font-weight: 400;">参与签名的字段使用的消息头：<br />x-op-timestamp:1525872629832<br />x-op-signature:xfX+bZxY2yl7EB/qdoDy9v/uscw3Nnj1pgoU+Bm6xdM=</p>
+<h2><strong>6.1&nbsp;</strong><strong><strong>示例</strong></strong></h2>
+<p style="font-weight: 400;">支付的回调消息类似如下：</p>
+<p style="font-weight: 400;">{</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"id":"py_2WvNMWLz2joeCxs1VhxG0TVq02O",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"ref_trade_id":"5000",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"account_id":"acct_juancash",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"amount":"10.00",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"currency":"php",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"payment_method":{</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id":"",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"type":"PAY_QRCODE",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"billing_details":null,</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"card":null,</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"direct_debit":null,</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"bank_account":null,</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"metadata":null</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;},</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"customer":null,</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"fee_amount":"0.38",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"exchange_rate":"0",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"status":"succeeded",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"metadata":null,</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"fail_reason":"",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"description":"AbC",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"return_url":"",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"callback_url":"",</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"trans_at":1697608780000,</p>
+<p style="font-weight: 400;">&nbsp;&nbsp;&nbsp;&nbsp;"object":"payment_order"</p>
+<p style="font-weight: 400;">}</p>
+<p style="font-weight: 400;">用于签名的payload为：</p>
+<p style="font-weight: 400;">timestamp=1697609372293&amp;body={"id":"py_2WvNMWLz2joeCxs1VhxG0TVq02O","ref_trade_id":"5000","account_id":"acct_juancash","amount":"10.00","currency":"php","payment_method":{"id":"","type":"PAY_QRCODE","billing_details":null,"card":null,"direct_debit":null,"bank_account":null,"metadata":null},"customer":null,"fee_amount":"0.38","exchange_rate":"0","status":"succeeded","metadata":null,"fail_reason":"","description":"AbC","return_url":"","callback_url":"","trans_at":1697608780000,"object":"payment_order"}</p>
+<p style="font-weight: 400;">生成的签名为：</p>
+<p style="font-weight: 400;">e1bad1563de6ab18fa4b6f6466dd9880a87186b6b45480a598c35630db9307af</p>

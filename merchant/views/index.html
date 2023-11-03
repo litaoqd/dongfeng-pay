@@ -99,15 +99,21 @@
                         API文档
                       </a>
                       <ul id="apiDocsDropdown" class="collapse list-unstyled">
-                        <li><a href="/api_docs/revision_log.html">修订日志</a></li>
-                        <li><a href="/api_docs/interface_convention.html">接口约定</a></li>
-                        <li><a href="/api_docs/error_codes.html">错误码说明</a></li>
-                        <li><a href="/api_docs/security_mechanism.html">安全认证机制</a></li>
-                        <li><a href="/api_docs/api_directory.html">API接口目录</a></li>
-                        <li><a href="/api_docs/notification_handling.html">通知事件处理</a></li>
+                        <li><a href="javascript:void(0);" onclick="loadContent('/api_docs/revision_log.html')">
+                            修订日志</a></li>
+                        <li><a href="javascript:void(0);" onclick="loadContent('/api_docs/interface_convention.html')">
+                            接口约定</a></li>
+                        <li><a href="javascript:void(0);" onclick="loadContent('/api_docs/error_codes.html')">
+                            错误码说明</a></li>
+                        <li><a href="javascript:void(0);" onclick="loadContent('/api_docs/security_mechanism.html')">
+                            安全认证机制</a></li>
+                        <li><a href="javascript:void(0);" onclick="loadContent('/api_docs/api_directory.html')">
+                            API接口目录</a></li>
+                        <li><a href="javascript:void(0);" onclick="loadContent('/api_docs/notification_handling.html')">
+                            通知事件处理</a></li>
                       </ul>
                     </li>
-                                </ul>
+                </ul>
             </nav>
         <div class="content-inner">
             <!-- Page Header-->
@@ -247,6 +253,21 @@
     //         index.loadTradeRecord();
     //     }, 1000);
     // });
+    function loadContent(contentPath) {
+    $.ajax({
+        url: contentPath,
+        type: 'GET',
+        success: function(response) {
+            // 将获取到的内容加载到.content-inner中
+            $('.content-inner').html(response);
+        },
+        error: function() {
+            // 错误处理，可以加载错误消息或者默认内容
+            $('.content-inner').html('<p>内容加载失败。</p>');
+        }
+    });
+}
+
 </script>
 </body>
 </html>

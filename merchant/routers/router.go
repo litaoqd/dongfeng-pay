@@ -60,4 +60,8 @@ func init() {
 	beego.Router("/withdraw/launch_single_withdraw/?:params", &controllers.Withdraw{}, "*:LaunchSingleWithdraw")
 	beego.Router("/withdraw/show_list_ui", &controllers.Withdraw{}, "*:ShowListUI")
 	beego.Router("/withdraw/list_record/?:params", &controllers.Withdraw{}, "*:WithdrawQueryAndListPage")
+	
+    beego.SetStaticPath("/api_docs", "views/api_docs")
+
+
 }

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>安全认证机制</title>
+    <link rel="stylesheet" href="/static/css/apidoc.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            安全认证机制
+        </div>
+
+        <p>对商户发起交易请求，采用<b>bearer token</b>的方式鉴权。OnePay会分配给客户<b>secret key</b>，不同环境secret key串会是：<code>sk_test_xxxxxxx</code>和<code>sk_prd_xxxxx</code></p>
+        
+        <p>注：为了给客户对接和测试接口时提供更好的易用性。我们对交易请求并没有采用HMAC的鉴权方式，参考Stripe API采用了bearer token的认证方式。通过https完全可以防消息篡改，此外也有IP白名单机制做防护。</p>
+
+        <div class="footer">
+            © 2023 OnePay. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

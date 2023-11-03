@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>修订日志</title>
+    <link rel="stylesheet" href="/static/css/apidoc.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+    <div class="container">
+        <div class="header">修订日志</div>
+
+        <table class="revision-table">
+            <thead>
+                <tr>
+                    <th>修改内容</th>
+                    <th>修改原因</th>
+                    <th>修改时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>创建文档</td>
+                    <td>新建</td>
+                    <td>2023-10-11</td>
+                </tr>
+                <tr>
+                    <td>修复payment_intent和disburse的create接口中channel和fund_channel的枚举值</td>
+                    <td>调整渠道的枚举定义</td>
+                    <td>2023-10-17</td>
+                </tr>
+                <tr>
+                    <td>补充支付和代付查询列表接口的说明；补充回调通知的说明</td>
+                    <td>查询列表的接口之前没有明确有介绍</td>
+                    <td>2023-10-18</td>
+                </tr>
+                <tr>
+                    <td>去掉代付目标银行账号需要RSA加密的要求</td>
+                    <td>用处不大，反而增加对接复杂度</td>
+                    <td>2023-10-18</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            © 2023 OnePay. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>
