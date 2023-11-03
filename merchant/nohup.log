@@ -1325,3 +1325,59 @@ dynamicCode: 909065
 
 2023/11/03 19:04:42.097 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|  12.222615ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
 
+2023/11/03 19:05:42.092 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|  13.251681ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 19:06:42.092 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|  13.159729ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 19:07:42.087 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|  12.890636ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 19:08:42.082 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|  13.487271ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 19:09:42.077 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|   13.46789ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 19:10:42.086 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|  13.704235ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 19:11:42.085 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|   13.19576ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 19:11:58.971 [1;44m[D][0m [router.go:955]  |220.246.252.127|[90;47m 302 [0m|    175.044µs|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 19:11:59.115 [1;44m[D][0m [router.go:955]  |220.246.252.127|[97;42m 200 [0m|   2.369045ms|   match|[97;44m GET     [0m /     r:/
+
+2023/11/03 19:12:22.063 [1;44m[D][0m [router.go:955]  | 14.117.217.126|[97;42m 200 [0m|   1.820549ms|   match|[97;44m GET     [0m /     r:/
+
+2023/11/03 19:12:22.380 [1;44m[D][0m [router.go:955]  | 14.117.217.126|[97;42m 200 [0m| 127.209407ms|   match|[97;44m GET     [0m /static/vendor/bootstrap/css/bootstrap.min.css
+
+2023/11/03 19:12:22.761 [1;44m[D][0m [router.go:955]  |  14.117.197.30|[97;42m 200 [0m|    480.365µs|   match|[97;44m GET     [0m /static/vendor/font-awesome/css/font-awesome.min.css
+
+2023/11/03 19:12:22.792 [1;44m[D][0m [router.go:955]  | 14.117.217.126|[97;42m 200 [0m|    550.548µs|   match|[97;44m GET     [0m /static/vendor/jquery/jquery.min.js
+
+2023/11/03 19:12:23.532 [1;44m[D][0m [router.go:955]  | 121.234.174.83|[97;42m 200 [0m|    103.837µs|   match|[97;44m GET     [0m /static/css/custom.css
+
+2023/11/03 19:12:28.433 [1;44m[D][0m [router.go:955]  |180.120.215.181|[97;42m 200 [0m|    359.539µs|   match|[97;44m GET     [0m /static/vendor/toastr-2.1.4-7/toastr.min.css
+
+2023/11/03 19:12:28.529 [1;44m[D][0m [router.go:955]  | 121.234.174.83|[97;42m 200 [0m|     268.28µs|   match|[97;44m GET     [0m /static/js/front.js
+
+2023/11/03 19:12:28.533 [1;44m[D][0m [router.go:955]  |180.120.215.181|[97;42m 200 [0m|    414.324µs|   match|[97;44m GET     [0m /static/vendor/bootstrap/js/bootstrap.min.js
+
+2023/11/03 19:12:28.657 [1;44m[D][0m [router.go:955]  | 121.234.174.83|[97;42m 200 [0m|    177.225µs|   match|[97;44m GET     [0m /static/vendor/jquery.cookie/jquery.cookie.js
+
+2023/11/03 19:12:28.765 [1;44m[D][0m [router.go:955]  | 121.234.174.83|[97;42m 200 [0m|    199.355µs|   match|[97;44m GET     [0m /static/vendor/toastr-2.1.4-7/toastr.min.js
+
+2023/11/03 19:12:28.852 [1;44m[D][0m [router.go:955]  |180.120.215.181|[97;42m 200 [0m|     142.56µs|   match|[97;44m GET     [0m /static/js/login.js
+
+2023/11/03 19:12:29.836 [1;44m[D][0m [router.go:955]  |  114.232.109.4|[97;42m 200 [0m|        473µs|   match|[97;44m GET     [0m /static/css/style.blue.css
+
+2023/11/03 19:12:29.912 [1;44m[D][0m [router.go:955]  |183.164.245.210|[97;42m 200 [0m|     105.54µs|   match|[97;44m GET     [0m /static/css/fontastic.css
+
+2023/11/03 19:12:30.376 [1;44m[D][0m [router.go:955]  |183.164.245.210|[97;42m 200 [0m|    573.759µs|   match|[97;44m GET     [0m /static/vendor/font-awesome/fonts/fontawesome-webfont.woff2
+
+2023/11/03 19:12:42.076 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|  10.962742ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 19:13:42.069 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|  11.857186ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 19:14:42.072 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|  13.515369ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 19:15:42.073 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|  12.326038ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
+2023/11/03 19:16:42.065 [1;44m[D][0m [router.go:955]  | 112.206.254.82|[97;42m 200 [0m|  12.340654ms|   match|[97;44m GET     [0m /index/get_balance   r:/index/get_balance
+
