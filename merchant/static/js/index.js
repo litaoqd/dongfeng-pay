@@ -87,7 +87,7 @@ let index = {
     },
     
     updateBalance: function() {
-        console.log("!!!!!!!!!!!!!!!!updateBalance function called");
+        // console.log("!!!!!!!!!!!!!!!!updateBalance function called");
         $.ajax({
             url: "/index/get_balance",
             type: "GET",
@@ -96,8 +96,8 @@ let index = {
                 $("#balanceAmt").text(response.cash_balance);
                 $("#amountFrozen").text(response.receivable_balance);
                 $("#balance").val(response.cash_balance);
-                console.log("Balance Amount: ", response.cash_balance);
-                console.log("Amount Frozen: ", response.receivable_balance);
+                // console.log("Balance Amount: ", response.cash_balance);
+                // console.log("Amount Frozen: ", response.receivable_balance);
             },
             error: function(error) {
                 console.log("Error fetching balance: ", error);

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>通知事件处理</title>
+    <link rel="stylesheet" href="/static/css/apidoc.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            通知事件处理 (Webhook)
+        </div>
+        
+        <div class="section">
+            <p>
+                不同的交易，在交易完成后，会回调通知商户。消息体为相应交易涉及的业务对象，比如代收的回调通知为PaymentIntent对象（5.1.1），代付的回调通知为DisburseOrder对象（5.2.1）。如果是交易失败了，可以在fail_reason得到失败原因。可以通过返回数据中的object字段区分对象类型进行不同的解析处理。
+            </p>
+            <p>
+                商户可以统一设置回调地址，或者在发送支付或代付请求时传callback_url。
+            </p>
+            <p>
+                回调通知采用采用API signing的鉴权方式，在商户onboarding完成后，会分配给商户accessSecret，不同的accessSecret对应相应的环境：测试环境/生产环境，类似：sk_test_xxxxx 或 sk_prd_xxxxxx。
+            </p>
+            <div class="section-header">
+                签名方式
+            </div>
+            <code>
+                payload: timestamp=${timestamp}&body=${body};<br>
+                x-op-signature: 使用accessSecret对payload取HmacSHA256哈希值。
+            </code>
+            <div class="section-header">
+                请求body的字符串规则
+            </div>
+            <p>
+                content-type为application/json时，取整个json字符串（目前只考虑application/json的情况）；
+            </p>
+            <div class="section-header">
+                参与签名的字段使用的消息头
+            </div>
+            <code>
+                x-op-timestamp:1525872629832<br>
+                x-op-signature:xfX+bZxY2yl7EB/qdoDy9v/uscw3Nnj1pgoU+Bm6xdM=
+            </code>
+            <div class="section-header">
+                示例
+            </div>
+            <pre><code>
+{
+    "id":"py_2WvNMWLz2joeCxs1VhxG0TVq02O",
+    "ref_trade_id":"5000",
+    "account_id":"acct_juancash",
+    "amount":"10.00",
+    "currency":"php",
+    "payment_method":{
+        "id":"",
+        "type":"PAY_QRCODE",
+        "billing_details":null,
+        "card":null,
+        "direct_debit":null,
+        "bank_account":null,
+        "metadata":null
+    },
+    "customer":null,
+    "fee_amount":"0.38",
+    "exchange_rate":"0",
+    "status":"succeeded",
+    "metadata":null,
+    "fail_reason":"",
+    "description":"AbC",
+    "return_url":"",
+    "callback_url":"",
+    "trans_at":1697608780000,
+    "object":"payment_order"
+}
+            </code></pre>
+            <div class="section-header">
+                用于签名的payload
+            </div>
+            <pre><code>
+timestamp=1697609372293&body={"id":"py_2WvNMWLz2joeCxs1VhxG0TVq02O","ref_trade_id":"5000","account_id":"acct_juancash","amount":"10.00","currency":"php","payment_method":{"id":"","type":"PAY_QRCODE","billing_details":null,"card":null,"direct_debit":null,"bank_account":null,"metadata":null},"customer":null,"fee_amount":"0.38","exchange_rate":"0","status":"succeeded","metadata":null,"fail_reason":"","description":"AbC","return_url":"","callback_url":"","trans_at":1697608780000,"object":"payment_order"}
+            </code></pre>
+            <div class="section-header">
+                生成的签名
+            </div>
+            <code>
+                e1bad1563de6ab18fa4b6f6466dd9880a87186b6b45480a598c35630db9307af
+            </code>
+        </div>
+
+        <div class="footer">
+            © 2023 OnePay. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>
