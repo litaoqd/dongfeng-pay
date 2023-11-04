@@ -113,6 +113,10 @@
             return false;
         }
     });
+    $('form').on('submit', function(e) {
+    var orderNo = $('#orderid').val();
+    $('#orderid').val(orderNo);
+});
 </script>
 </body>
 

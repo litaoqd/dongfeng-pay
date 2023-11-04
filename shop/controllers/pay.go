@@ -14,6 +14,9 @@ import (
 	"github.com/beego/beego/v2/server/web"
 	"strconv"
 	"strings"
+	"net/http"
+	"encoding/json" // This is for json
+    "bytes"        // This is for bytes
 )
 
 type PayController struct {
@@ -75,4 +78,69 @@ func (c *PayController) judgeAmount(amount string) bool {
 	}
 
 	return true
+}
+
+// GCashPay 处理GCash支付请求
+func (c *PayController) GCashPay() {
+    // 从表单中获取订单编号
+    orderNo := c.GetString("orderid")
+    // 在订单编号前添加 'test'
+    refTradeID := "test" + orderNo
+
+    // 构建请求体
+    requestBody := map[string]interface{}{
+        "ref_trade_id": refTradeID,
+        "amount":       "100",
+        "currency":     "php",
+        "callback_url": "This is a test callback_url - pay in",
+        "customer": map[string]string{
+            "first_name": "wowo",
+            "last_name":  "totot",
+            "email":      "wwwd@sina.com",
+        },
+        "payment_method": map[string]interface{}{
+            "type": "direct_debit",
+            "direct_debit": map[string]string{
+                "channel": "jcpay_qrcode",
+            },
+        },
+        "description": "AbC",
+    }
+
+    // 将请求体编码为JSON
+    jsonValue, _ := json.Marshal(requestBody)
+
+    // 创建POST请求
+    request, err := http.NewRequest("POST", "https://api.onepayph.com/api/v1/payment_intent", bytes.NewBuffer(jsonValue))
+    if err != nil {
+        logs.Error("创建请求失败:", err)
+        c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+        return
+    }
+
+    // 添加认证头部
+    request.Header.Set("Authorization", "Bearer juancash")
+    request.Header.Set("Content-Type", "application/json")
+
+    // 发送请求
+    client := &http.Client{}
+    response, err := client.Do(request)
+    if err != nil {
+        logs.Error("发送请求失败:", err)
+        c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+        return
+    }
+    defer response.Body.Close()
+
+    // 读取响应
+    if response.StatusCode == http.StatusOK {
+        var result map[string]interface{}
+        json.NewDecoder(response.Body).Decode(&result)
+        // 处理结果，例如发送二维码到前端
+        c.Data["json"] = result["qr_code_content"]
+        c.ServeJSON()
+    } else {
+        // 处理错误
+        c.Ctx.ResponseWriter.WriteHeader(response.StatusCode)
+    }
 }

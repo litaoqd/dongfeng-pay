@@ -91,6 +91,29 @@
         }*/
     }
 </script>
+<!-- 在 shop/views/pay/scan.html 中添加 -->
+<script type="text/javascript">
+    $(document).ready(function() {
+        // 获取订单编号
+        var orderNo = $('span:contains("订单编号")').next().text();
+
+        // 调用后端API获取二维码
+        $.ajax({
+            url: '/pay/gcashpay', // 这是后端的路由地址
+            type: 'post',
+            data: { orderid: orderNo }, // 发送订单编号到后端
+            success: function(response) {
+                // 显示二维码
+                $('#gcash_qr_img').attr('src', response.qr_code_content);
+                $('#gcash_qr_code').show();
+            },
+            error: function(xhr) {
+                // 处理错误
+                alert('支付请求失败');
+            }
+        });
+    });
+</script>
 </body>
 </html>
 
