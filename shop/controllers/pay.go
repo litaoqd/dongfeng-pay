@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"encoding/json" // This is for json
     "bytes"        // This is for bytes
+    "net/url"
 )
 
 type PayController struct {
@@ -131,14 +132,23 @@ func (c *PayController) GCashPay() {
         return
     }
     defer response.Body.Close()
-
+    logs.Info("请求成功！")
     // 读取响应
     if response.StatusCode == http.StatusOK {
         var result map[string]interface{}
         json.NewDecoder(response.Body).Decode(&result)
-        // 处理结果，例如发送二维码到前端
-        c.Data["json"] = result["qr_code_content"]
-        c.ServeJSON()
+        
+        // 提取二维码内容
+        qrCodeContent, ok := result["qr_code_content"].(string)
+        if !ok {
+            logs.Error("二维码内容不存在")
+            c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+            return
+        }
+
+        
+        // 重定向到scan.html，并传递二维码内容
+        c.Redirect("/scan.html?qrCode="+url.QueryEscape(qrCodeContent), 302)
     } else {
         // 处理错误
         c.Ctx.ResponseWriter.WriteHeader(response.StatusCode)

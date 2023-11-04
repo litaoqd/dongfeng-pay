@@ -1,119 +1,123 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-    <meta http-equiv="Content-Language" content="zh-cn">
-    <meta name="apple-mobile-web-app-capable" content="no">
-    <meta name="apple-touch-fullscreen" content="yes">
-    <meta name="format-detection" content="telephone=no,email=no">
-    <meta name="apple-mobile-web-app-status-bar-style" content="white">
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
-    <meta http-equiv="Expires" content="0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Cache-control" content="no-cache">
-    <meta http-equiv="Cache" content="no-cache">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <title>
-        {{.payTypeName}}    </title>
-    <link href="../../static/css/pay.css" rel="stylesheet" media="screen">
+    <meta charset="UTF-8">
+    <title>Scan QR Code</title>
+    <!-- Use the latest version of the qrcode.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        /* Style for the header with payment icons */
+        .header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 2px solid #ccc;
+            background-color: #f8f8f8;
+        }
+        .payment-icons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .payment-icons img {
+            width: 100px; /* Set a fixed width for all images */
+            margin: 0 10px;
+        }
+        /* Ensure the QR code and instructions are centered on the page */
+        #content {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        #qrcode {
+            margin: 20px 0;
+        }
+        /* Style for the download button */
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #007bff; /* Tech blue color */
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+            transition: all 0.3s;
+        }
+        .button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 7px #666;
+        }
+        .button:active {
+            background-color: #003d82;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+    </style>
 </head>
-
 <body>
-<div class="body">
-    <h1 class="mod-title">
-        <span class="ico_log
-        ico-0"></span>
-    </h1>
-    <div class="mod-ct">
-        <div class="order">
-        </div>
-        <div class="amount" id="money" style="font-size: 8px;">
-            <label style="color: red;font-size: 30px;">￥{{.price}}</label>        </div>
-        <div class="paybtn" style="display: none;" id="btnalipay">
-            <div class="payalipaybtn" style="display: none;">
-                {{.openApp}}
-            </div>
-
-            <h1 style="font-size:1.5em;color:red;">1.截图保存二维码到手机</h1>
-            <h1 style="font-size:1.5em;color:red;">2.打开对应的app进行支付</h1>            <div id="openalipay" style="display: none"></div>
-        </div>
-        <div style="color:blue;font-size:13px; display: block;">
-            方式一：直接<label style="color: red;"> {{.openApp}}</label>进行支付APP扫码支付！<br/>            方式二：截图保存到相册，再<label style="color: red;"> {{.openApp}}</label>，从相册选择图片！<br>            温馨提示：请不要重复支付，不要修改金额，否则无法到账 </div>        <div class="qrcode-img-wrapper" data-role="qrPayImgWrapper">
-        <div data-role="qrPayImg" class="qrcode-img-area">
-            <div class="ui-loading qrcode-loading" data-role="qrPayImgLoading" style="display: none;"></div>
-            <div style="position: relative;display: inline-block;">
-                <div id="show_qrcode" style="padding:8px;"></div>
-                <img src="{{.qrCode}}" width="200px" height="200px">
-            </div>
+    <div class="header">
+        <!-- Payment icons at the top -->
+        <div class="payment-icons">
+            <img src="../static/img/gcash.png" alt="Gcash">
+            <img src="../static/img/paymaya.png" alt="Paymaya">
+            <img src="../static/img/grab.png" alt="Grab">
         </div>
     </div>
-
-        <div class="time-item" style="padding-top: 5px">
-            <div class="time-item" id="msg"><h2>付款即时到账，未到账可联系我们。                    <br>订单号：{{.orderNo}}</h2></div>
-
-        </div>
-       {{/* <div class="tip">
-            <div class="tip-text">
-                <i src="../../static/img/epay.jpg" width="30" height="30"></i>                <p id="showtext">打开
-                各大银行APP [扫一扫]</p>
-            </div>
-        </div>*/}}
-        <div class="tip-text">
-        </div>
+    <div id="content">
+        <!-- The QR code will be generated inside this div -->
+        <div id="qrcode"></div>
+        <!-- Button to download the QR code -->
+        <button class="button" id="downloadBtn">下载二维码</button>
+        <!-- Instructions for users -->
+        <p>请扫描上方的二维码进行支付测试，或<br>点击下载按钮保存二维码在GCash扫码中上传完成支付。</p>
     </div>
 
-</div>
-
-<br>
-<script type="text/javascript" src="../../static/js/jquery-3.2.1.min.js"></script>
-<script type="text/javascript">
-    //每隔2秒检测cookie中订单状态
-    var count = 0;
-    /*setInterval('getSession()', 3000);
-    function getSession() {
-        if (count <= 300) {
-            $.ajax({
-                type: "GET",
-                url: "/queryOrderStatus.py/" +{{.orderNo}},
-                dataType: "JSON",
-                success: function (res) {
-                    console.info(res.code);
-                    if (res.code == "9") {
-                        $("#status").val(res.tradeStatus);
-                        window.location.href = "/queryOrder.py/";
-                    }
-                }
-            });
-            count++;
-        }*/
-    }
-</script>
-<!-- 在 shop/views/pay/scan.html 中添加 -->
-<script type="text/javascript">
-    $(document).ready(function() {
-        // 获取订单编号
-        var orderNo = $('span:contains("订单编号")').next().text();
-
-        // 调用后端API获取二维码
-        $.ajax({
-            url: '/pay/gcashpay', // 这是后端的路由地址
-            type: 'post',
-            data: { orderid: orderNo }, // 发送订单编号到后端
-            success: function(response) {
-                // 显示二维码
-                $('#gcash_qr_img').attr('src', response.qr_code_content);
-                $('#gcash_qr_code').show();
-            },
-            error: function(xhr) {
-                // 处理错误
-                alert('支付请求失败');
+<script>
+    // Function to parse URL parameters
+    function getQueryParam(param) {
+        var search = window.location.search.substring(1);
+        var vars = search.split('&');
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split('=');
+            if (decodeURIComponent(pair[0]) === param) {
+                return decodeURIComponent(pair[1].replace(/\+/g, ' '));
             }
-        });
+        }
+        return null;
+    }
+
+    var qrCodeContent = getQueryParam('qrCode');
+    if (qrCodeContent) {
+        var qrcode = document.createElement('img');
+        qrcode.src = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(qrCodeContent);
+        qrcode.alt = 'QR Code';
+        document.getElementById('qrcode').appendChild(qrcode);
+    } else {
+        document.getElementById('qrcode').innerText = '无法加载二维码。';
+    }
+
+    // Function to handle the download of the QR code
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+        if (qrCodeContent) {
+            var downloadLink = document.createElement('a');
+            downloadLink.href = qrcode.src;
+            downloadLink.download = 'QRCode.png';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
     });
 </script>
 </body>
 </html>
-
