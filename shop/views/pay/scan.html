@@ -118,6 +118,34 @@
             document.body.removeChild(downloadLink);
         }
     });
+    
+    var refTradeID = getQueryParam('refTradeID');
+
+    // 定义检查支付状态的函数
+    function checkPaymentStatus() {
+        fetch('/check_payment_status?refTradeID=' + encodeURIComponent(refTradeID))
+            .then(function(response) {
+                // 检查响应是否OK以及内容类型是否为JSON
+                if (response.ok && response.headers.get('Content-Type').includes('application/json')) {
+                    return response.json();
+                } else {
+                    // 处理非JSON响应或服务器错误
+                    throw new Error('服务器响应非JSON格式的回复');
+                }
+            })
+            .then(function(data) {
+                if (data.status === 'succeeded') {
+                    // 如果支付成功，重定向到payment_result.html
+                    window.location.href = '/payment_result.html';
+                }
+            })
+            .catch(function(error) {
+                console.error('错误:', error);
+            });
+    }
+    
+    // 设置定时器检查支付状态
+    setInterval(checkPaymentStatus, 5000); // 每5秒检查一次
 </script>
 </body>
 </html>

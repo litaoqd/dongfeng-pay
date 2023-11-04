@@ -13,4 +13,6 @@ func init() {
 	web.Router("/scan.html", &controllers.ScanShopController{}, "*:ScanRender")
 	web.Router("/error.html", &controllers.HomeAction{}, "*:ErrorPage")
 	web.SetStaticPath("/payment_result.html", "static/payment_result.html")
+	web.Router("/check_payment_status", &controllers.PayController{}, "get:CheckPaymentStatus")
+
 }

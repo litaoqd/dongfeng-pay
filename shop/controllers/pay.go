@@ -250,7 +250,9 @@ func (c *PayController) GCashPay() {
 
         
         // 重定向到scan.html，并传递二维码内容
-        c.Redirect("/scan.html?qrCode="+url.QueryEscape(qrCodeContent), 302)
+        // c.Redirect("/scan.html?qrCode="+url.QueryEscape(qrCodeContent), 302)
+        c.Redirect("/scan.html?qrCode="+url.QueryEscape(qrCodeContent)+"&refTradeID="+url.QueryEscape(refTradeID), 302)
+
     } else {
         // 处理错误
         c.Ctx.ResponseWriter.WriteHeader(response.StatusCode)
