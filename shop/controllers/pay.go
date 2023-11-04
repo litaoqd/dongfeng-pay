@@ -84,53 +84,67 @@ func (c *PayController) judgeAmount(amount string) bool {
 }
 
 // CheckPaymentStatus 是一个新的方法，用于检查支付状态
-func (c *PayController) CheckPaymentStatus(refTradeID string) (string, error) {
-	// 构建请求URL
-	apiURL := "https://api.onepayph.com/api/v1/payment_intent/" + refTradeID
+func (c *PayController) CheckPaymentStatus() {
+    // 从请求中获取refTradeID
+    refTradeID := c.GetString("refTradeID")
 
-	// 创建HTTP客户端
-	client := &http.Client{}
+    // 构建请求URL
+    apiURL := "https://api.onepayph.com/api/v1/payment_intent/ref_trade_id/" + refTradeID
+    logs.Info(apiURL)
+    
 
-	// 创建请求
-	req, err := http.NewRequest("GET", apiURL, nil)
-	if err != nil {
-		logs.Error("创建请求失败:", err)
-		return "", err
-	}
+    // 创建HTTP客户端
+    client := &http.Client{}
 
-	// 设置认证头部
-	req.Header.Set("Authorization", "Bearer juancash")
+    // 创建请求
+    req, err := http.NewRequest("GET", apiURL, nil)
+    if err != nil {
+        c.Data["json"] = map[string]string{"error": "创建请求失败"}
+        c.ServeJSON()
+        return
+    }
 
-	// 发送请求
-	resp, err := client.Do(req)
-	if err != nil {
-		logs.Error("发送请求失败:", err)
-		return "", err
-	}
-	defer resp.Body.Close()
+    // 设置认证头部
+    req.Header.Set("Authorization", "Bearer juancash")
 
-	// 检查响应状态码
-	if resp.StatusCode != http.StatusOK {
-		logs.Error("请求失败，状态码：", resp.StatusCode)
-		return "", err
-	}
+    // 发送请求
+    resp, err := client.Do(req)
+    if err != nil {
+        c.Data["json"] = map[string]string{"error": "发送请求失败"}
+        c.ServeJSON()
+        return
+    }
+    defer resp.Body.Close()
+    
+    logs.Info(resp)
 
-	// 解析响应体为JSON
-	var result map[string]interface{}
-	err = json.NewDecoder(resp.Body).Decode(&result)
-	if err != nil {
-		logs.Error("解析响应体失败:", err)
-		return "", err
-	}
+    // 检查响应状态码
+    if resp.StatusCode != http.StatusOK {
+        c.Data["json"] = map[string]string{"error": "请求失败，状态码：" + strconv.Itoa(resp.StatusCode)}
+        c.ServeJSON()
+        return
+    }
 
-	// 获取并返回状态字段
-	status, ok := result["status"].(string)
-	if !ok {
-		logs.Error("响应体中不存在status字段")
-		return "", err
-	}
+    // 解析响应体为JSON
+    var result map[string]interface{}
+    err = json.NewDecoder(resp.Body).Decode(&result)
+    if err != nil {
+        c.Data["json"] = map[string]string{"error": "解析响应体失败"}
+        c.ServeJSON()
+        return
+    }
 
-	return status, nil
+    // 获取并返回状态字段
+    status, ok := result["status"].(string)
+    if !ok {
+        c.Data["json"] = map[string]string{"error": "响应体中不存在status字段"}
+        c.ServeJSON()
+        return
+    }
+
+    // 设置JSON数据并返回
+    c.Data["json"] = map[string]string{"status": status}
+    c.ServeJSON()
 }
 
 // PaymentCallback 处理上游渠道的支付回调
@@ -187,13 +201,14 @@ func (c *PayController) PaymentCallback() {
 func (c *PayController) GCashPay() {
     // 从表单中获取订单编号
     orderNo := c.GetString("orderid")
+    orderamount := c.GetString("amount")
     // 在订单编号前添加 'test'
     refTradeID := "test" + orderNo
 
     // 构建请求体
     requestBody := map[string]interface{}{
         "ref_trade_id": refTradeID,
-        "amount":       "10",
+        "amount":       orderamount,
         "currency":     "php",
         "callback_url": "http://merchant.onepayph.com:12308/payment_callback",
         "customer": map[string]string{

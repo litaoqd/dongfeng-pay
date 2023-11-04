@@ -3,21 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <title>Payment Result</title>
+    <link rel="stylesheet" href="../static/lib/bootstrap/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        /* Style for the header with payment icons */
+        .header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 2px solid #ccc;
+            background-color: #f8f8f8;
+        }
+        .payment-icons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .payment-icons img {
+            width: 100px; /* Set a fixed width for all images */
+            margin: 0 10px;
+        }
+        /* Style for the content */
+        #content {
+            text-align: center;
+            padding: 50px;
+        }
+        #callbackData {
+            font-size: 1.2em;
+            color: green;
+            margin-top: 20px;
+        }
+        /* Style for the return button */
+        .return-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 1em;
+            color: white;
+            background-color: #007bff; /* Tech blue color */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .return-btn:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+    </style>
 </head>
 <body>
-    <h1>支付结果</h1>
-    <pre id="callbackData"></pre>
+    <div class="header">
+        <!-- Payment icons at the top -->
+        <div class="payment-icons">
+            <img src="../static/img/gcash.png" alt="Gcash">
+            <img src="../static/img/paymaya.png" alt="Paymaya">
+            <img src="../static/img/grab.png" alt="Grab">
+        </div>
+    </div>
+    <div id="content">
+        <h1>支付成功</h1>
+        <pre id="callbackData"></pre>
+        <!-- Button to return to the homepage -->
+        <a href="/" class="return-btn">返回主页</a>
+    </div>
 
-    <script>
-        // 显示回调数据
-        window.onload = function() {
-            var params = new URLSearchParams(window.location.search);
-            var callbackData = {};
-            for (const [key, value] of params) {
-                callbackData[key] = value;
-            }
-            document.getElementById('callbackData').textContent = JSON.stringify(callbackData, null, 4);
-        }
-    </script>
+    <!--<script>-->
+    <!--    window.onload = function() {-->
+    <!--        var params = new URLSearchParams(window.location.search);-->
+    <!--        var callbackData = {};-->
+    <!--        for (const [key, value] of params) {-->
+    <!--            callbackData[key] = value;-->
+    <!--        }-->
+    <!--        document.getElementById('callbackData').textContent = JSON.stringify(callbackData, null, 4);-->
+    <!--    }-->
+    <!--</script>-->
 </body>
 </html>
