@@ -18,6 +18,7 @@ import (
 	"encoding/json" // This is for json
     "bytes"        // This is for bytes
     "net/url"
+    "io/ioutil"
 )
 
 type PayController struct {
@@ -81,6 +82,42 @@ func (c *PayController) judgeAmount(amount string) bool {
 	return true
 }
 
+// PaymentCallback 处理上游渠道的支付回调
+func (c *PayController) PaymentCallback() {
+    // 记录接收到的回调请求
+    logs.Info("Received payment callback")
+
+    // 读取请求体
+    body, err := ioutil.ReadAll(c.Ctx.Request.Body)
+    if err != nil {
+        logs.Error("Error reading request body:", err)
+        c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+        return
+    }
+    logs.Info("Callback request body:", string(body))
+
+    // 解析请求体中的JSON数据
+    var callbackData map[string]interface{}
+    err = json.Unmarshal(body, &callbackData)
+    if err != nil {
+        logs.Error("Error unmarshalling request body:", err)
+        c.Ctx.ResponseWriter.WriteHeader(http.StatusBadRequest)
+        return
+    }
+    logs.Info("Parsed callback data:", callbackData)
+
+    // 验证回调的真实性（示例中省略了验证步骤）
+
+    // 更新订单状态等业务逻辑（示例中省略了业务逻辑）
+
+    // 记录业务处理的结果
+    logs.Info("Payment callback processed successfully")
+
+    // 重定向到显示结果的页面，并附带回调数据
+    c.Data["json"] = callbackData
+    c.ServeJSON()
+}
+
 // GCashPay 处理GCash支付请求
 func (c *PayController) GCashPay() {
     // 从表单中获取订单编号
@@ -93,7 +130,7 @@ func (c *PayController) GCashPay() {
         "ref_trade_id": refTradeID,
         "amount":       "100",
         "currency":     "php",
-        "callback_url": "This is a test callback_url - pay in",
+        "callback_url": "http://merchant.onepayph.com:12308/payment_callback",
         "customer": map[string]string{
             "first_name": "wowo",
             "last_name":  "totot",
