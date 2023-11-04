@@ -12,4 +12,5 @@ func init() {
 	web.Router("/pay_requst.html", &controllers.ScanShopController{})
 	web.Router("/scan.html", &controllers.ScanShopController{}, "*:ScanRender")
 	web.Router("/error.html", &controllers.HomeAction{}, "*:ErrorPage")
+	web.SetStaticPath("/payment_result.html", "static/payment_result.html")
 }

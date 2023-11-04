@@ -19,6 +19,7 @@ import (
     "bytes"        // This is for bytes
     "net/url"
     "io/ioutil"
+    "fmt"
 )
 
 type PayController struct {
@@ -82,6 +83,56 @@ func (c *PayController) judgeAmount(amount string) bool {
 	return true
 }
 
+// CheckPaymentStatus 是一个新的方法，用于检查支付状态
+func (c *PayController) CheckPaymentStatus(refTradeID string) (string, error) {
+	// 构建请求URL
+	apiURL := "https://api.onepayph.com/api/v1/payment_intent/" + refTradeID
+
+	// 创建HTTP客户端
+	client := &http.Client{}
+
+	// 创建请求
+	req, err := http.NewRequest("GET", apiURL, nil)
+	if err != nil {
+		logs.Error("创建请求失败:", err)
+		return "", err
+	}
+
+	// 设置认证头部
+	req.Header.Set("Authorization", "Bearer juancash")
+
+	// 发送请求
+	resp, err := client.Do(req)
+	if err != nil {
+		logs.Error("发送请求失败:", err)
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// 检查响应状态码
+	if resp.StatusCode != http.StatusOK {
+		logs.Error("请求失败，状态码：", resp.StatusCode)
+		return "", err
+	}
+
+	// 解析响应体为JSON
+	var result map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		logs.Error("解析响应体失败:", err)
+		return "", err
+	}
+
+	// 获取并返回状态字段
+	status, ok := result["status"].(string)
+	if !ok {
+		logs.Error("响应体中不存在status字段")
+		return "", err
+	}
+
+	return status, nil
+}
+
 // PaymentCallback 处理上游渠道的支付回调
 func (c *PayController) PaymentCallback() {
     // 记录接收到的回调请求
@@ -115,6 +166,20 @@ func (c *PayController) PaymentCallback() {
 
     // 重定向到显示结果的页面，并附带回调数据
     c.Data["json"] = callbackData
+    // c.ServeJSON()
+    // 构建查询参数
+    params := url.Values{}
+    for key, value := range callbackData {
+        // 假设回调数据中的值都是字符串类型
+        params.Add(key, fmt.Sprintf("%v", value))
+    }
+    queryString := params.Encode()
+
+    // // 重定向到显示结果的页面，并附带回调数据
+    // logs.Info("重定向到显示结果的页面，并附带回调数据")
+    // c.Redirect("/payment_result.html?" + queryString, 302)
+    // 返回 JSON 响应而不是重定向
+    c.Data["json"] = map[string]string{"redirect": "/payment_result.html?" + queryString}
     c.ServeJSON()
 }
 
@@ -128,7 +193,7 @@ func (c *PayController) GCashPay() {
     // 构建请求体
     requestBody := map[string]interface{}{
         "ref_trade_id": refTradeID,
-        "amount":       "100",
+        "amount":       "10",
         "currency":     "php",
         "callback_url": "http://merchant.onepayph.com:12308/payment_callback",
         "customer": map[string]string{
@@ -191,3 +256,5 @@ func (c *PayController) GCashPay() {
         c.Ctx.ResponseWriter.WriteHeader(response.StatusCode)
     }
 }
+
+

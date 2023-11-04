@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Result</title>
+</head>
+<body>
+    <h1>支付结果</h1>
+    <pre id="callbackData"></pre>
+
+    <script>
+        // 显示回调数据
+        window.onload = function() {
+            var params = new URLSearchParams(window.location.search);
+            var callbackData = {};
+            for (const [key, value] of params) {
+                callbackData[key] = value;
+            }
+            document.getElementById('callbackData').textContent = JSON.stringify(callbackData, null, 4);
+        }
+    </script>
+</body>
+</html>
