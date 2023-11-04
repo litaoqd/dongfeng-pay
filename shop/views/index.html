@@ -47,92 +47,52 @@
                         <input type="text" style="display: none" name="orderid" value="{{.orderNo}}">
 
                         <div class="two-step">
-                            <p><strong>请您及时付款，以便订单尽快处理！</strong>请您在提交订单后<span>24小时</span>内完成支付，否则订单会自动取消。</p>
+                            <p><strong>请您及时付款，以便订单尽快处理！</strong>请您在提交订单后<span>15分钟</span>内完成支付，否则订单会自动取消。</p>
                             <ul class="pay-infor">
                                 <li>商品名称：{{.pname}}</li>
                                 <li>订单编号：<span>{{.orderNo}}</span></li>
                             </ul>
                             <ul class="pay-infor">
                                 <li>支付金额：<strong><input type="text" id="amount" name="amount" value="" required>
-                                    <span>元</span></strong></li>
+                                    <span>PHP</span></strong></li>
                                 <li class="" style="float: left;">
                                     <button type="submit" class="pcdemo-btn sbpay-btn">立即支付</button>
                                 </li>
                             </ul>
-                            <h4>扫码支付：</h4>
+                            <h4>QRPH扫码支付：</h4>
                             <ul class="pay-label type">
                                 <li>
                                     <input value="UNION_SCAN" checked="checked" name="SCAN" id="UNION_SCAN" type="radio">
-                                    <label for="UNION_SCAN"><img src="../static/img/yunshanfu.jpg" alt="银联扫码"
+                                    <label for="UNION_SCAN"><img src="../static/img/gcash.png" alt="GCash"
                                                               style="height: 35px;"><span></span></label>
                                 </li>
                                 <li>
                                 <input value="ALI_SCAN" name="SCAN" id="ALI_SCAN" type="radio">
-                                <label for="ALI_SCAN"><img src="../static/img/zhifubao.png" alt="支付宝扫码支付"
+                                <label for="ALI_SCAN"><img src="../static/img/paymaya.png" alt="Paymaya"
                                 style="width:100px;height: 35px;"><span></span></label>
                                 </li>
                                 <li>
                                     <input value="WEIXIN_SCAN" name="SCAN" id="WEIXIN_SCAN" type="radio">
-                                        <label for="WEIXIN_SCAN"><img src="../static/img/weixin.png" alt="微信扫码支付"
+                                        <label for="WEIXIN_SCAN"><img src="../static/img/grab.png" alt="Grab"
                                     style="width:100px;height: 35px;"><span></span></label>
                                 </li>
                             </ul>
-                            <div id="pcOrPhone">
-                                <h4 style="margin-top: 125px">H5支付(只支持手机端,不支持PC端)：</h4>
-                                <ul class="pay-label type">
-                                    <li>
-                                        <input value="WEIXIN_H5" name="H5" id="WEIXIN_H5" type="radio">
-                                        <label for="WEIXIN_H5"><img src="../static/img/weixin.jpg" alt="微信H5"
-                                                                         style="height: 35px;"><span></span></label>
-                                    </li>
-                                    <li>
-                                        <input value="ALI_H5" name="H5" id="ALI_H5" type="radio">
-                                        <label for="ALI_H5"><img src="../static/img/zhifubao.png" alt="支付宝H5"
-                                                                          style="height: 35px;"><span></span></label>
-                                    </li>
-                                </ul>
-                            </div>
-                            <h4 style="margin-top: 120px">快捷支付：</h4>
+                            <h4 style="margin-top: 120px">银行卡支付（未开放）：</h4>
                             <ul class="pay-label type">
                                 <li>
                                     <input value="04031000" name="KJ" id="beijing_kj" type="radio">
-                                    <label for="beijing_kj"><img src="../static/img/beijing_0.jpg" alt="中国北京银行"
+                                    <label for="beijing_kj"><img src="../static/img/visa.png" alt="visa"
                                                                  style="height: 35px;"><span></span></label>
                                 </li>
                                 <li>
                                     <input value="01020000" name="KJ" id="gongshang_kj" type="radio">
-                                    <label for="gongshang_kj"><img src="../static/img/gongshang_0.jpg" alt="中国工商银行"
+                                    <label for="gongshang_kj"><img src="../static/img/master.png" alt="master"
                                                                    style="height: 35px;"><span></span></label>
                                 </li>
                                 <li>
                                     <input value="03030000" name="KJ" id="guangda_kj" type="radio">
-                                    <label for="guangda_kj"><img src="../static/img/guangda_0.jpg" alt="中国光大银行"
+                                    <label for="guangda_kj"><img src="../static/img/bdo.png" alt="bdo"
                                                                  style="height: 35px;"><span></span></label>
-                                </li>
-                                <li>
-                                    <input value="01050000" name="KJ" id="jianshe_kj" type="radio">
-                                    <label for="jianshe_kj"><img src="../static/img/jieshe_0.jpg" alt="中国建设银行"
-                                                                 style="height: 35px;"><span></span></label>
-                                </li>
-                                <li>
-                                    <input value="03050000" name="KJ" id="minsheng_kj" type="radio">
-                                    <label for="minsheng_kj"><img src="../static/img/minsheng_0.jpg" alt="中国民生银行"
-                                                                  style="height: 35px;"><span></span></label>
-                                </li>
-                                <li>
-                                    <input value="01030000" name="KJ" id="nongye_kj" type="radio">
-                                    <label for="nongye_kj"><img src="../static/img/nongye_0.jpg" alt="中国农业银行"
-                                                                style="height: 35px;"><span></span></label>
-                                </li>
-                                <li>
-                                    <input value="04012900" name="KJ" id="shanghai_kj" type="radio">
-                                    <label for="shanghai_kj"><img src="../static/img/shanghai_0.jpg" alt="中国上海银行"
-                                                                  style="height: 35px;"><span></span></label>
-                                </li>
-                                <li>
-                                    <input value="01000000" name="KJ" id="youzheng_kj" type="radio">
-                                    <label for="youzheng_kj"><img src="../static/img/youzheng_0.jpg" alt="中国邮政银行"
-                                                                  style="height: 35px;"><span></span></label>
                                 </li>
                             </ul>
                             <input value="CCB" name="bankCode" type="hidden">
