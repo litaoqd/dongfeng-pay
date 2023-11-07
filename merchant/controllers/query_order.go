@@ -36,7 +36,18 @@ func (c *QueryOrderController) SearchOrder() {
     
     fmt.Println("Merchant Key:", u.MerchantKey)
 
-    apiUrl := "https://api.onepayph.com/api/v1/payment_intent/ref_trade_id/" + merchantOrderId
+    // apiUrl := "https://api.onepayph.com/api/v1/payment_intent/ref_trade_id/" + merchantOrderId
+    
+    transactionType := c.GetString("transactionType") // 获取交易类型参数
+
+    var apiUrl string
+    if transactionType == "collect" {
+        // 如果是代收
+        apiUrl = fmt.Sprintf("https://api.onepayph.com/api/v1/payment_intent/ref_trade_id/%s", merchantOrderId)
+    } else {
+        // 默认为代付
+        apiUrl = fmt.Sprintf("https://api.onepayph.com/api/v1/disburse/ref_trade_id/%s", merchantOrderId)
+    }
 
     // 创建一个新的 HTTP 请求
     req, err := http.NewRequest("GET", apiUrl, nil)

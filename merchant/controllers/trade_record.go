@@ -238,7 +238,7 @@ func (c *TradeRecordController) Fetch() {
         apiUrl = fmt.Sprintf("https://api.onepayph.com/api/v1/payment_intent?start=%d&end=%d&status=%s&page_size=20&start_after=%s&end_before=%s", startTimestamp, endTimestamp, status, startAfter, endBefore)
     } else {
         // 默认为代付
-        apiUrl = fmt.Sprintf("https://api.onepayph.com/api/v1/disburse_order?start=%d&end=%d&status=%s&page_size=20&start_after=%s&end_before=%s", startTimestamp, endTimestamp, status, startAfter, endBefore)
+        apiUrl = fmt.Sprintf("https://api.onepayph.com/api/v1/disburse?start=%d&end=%d&status=%s&page_size=20&start_after=%s&end_before=%s", startTimestamp, endTimestamp, status, startAfter, endBefore)
     }
 	fmt.Println("****************apiUrl:", apiUrl)
 
@@ -276,11 +276,15 @@ func convertToTimestamp(dateTimeStr string) (int64, error) {
 		return 0, nil
 	}
 
-	layout := "2006-01-02 15:04:00" // Go 的时间格式化布局
+	// Go 的时间格式化布局
+	layout := "2006-01-02 15:04:05" // 注意秒的格式应为05而不是00
 	t, err := time.Parse(layout, dateTimeStr)
 	if err != nil {
 		return 0, err
 	}
+
+	// 减去8小时以解决时区问题
+	t = t.Add(-8 * time.Hour)
 
 	return t.UnixMilli(), nil
 }

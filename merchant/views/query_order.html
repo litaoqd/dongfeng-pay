@@ -157,7 +157,16 @@
                             <div class="card">
                             <div class="card-header d-flex align-items-center search-container">
                                 <input type="text" id="merchantOrderId" placeholder="商户订单号" class="form-control mr-3" onkeypress="handleKeyPress(event)">
-                                <button onclick="searchOrder()" class="btn btn-primary">搜索</button>
+                                
+                                <!-- 在 query_order.html 中添加，使用相同的类和宽度设置 -->
+                                <label for="transactionType">交易类型:</label>
+                                <select id="transactionType" name="transactionType" class="form-control" style="max-width: 100px;">
+                                    <option value="collect">代收</option>
+                                    <option value="disburse">代付</option>
+                                </select>
+                                
+                                                                
+                                <button onclick="searchOrder()" class="btn btn-primary" style="margin-left: 15px;">搜索</button>
                             </div>
                                 <div class="card-body">
                                     <div id="orderResult"></div>
@@ -175,12 +184,15 @@
 <script>
 function searchOrder() {
     var merchantOrderId = document.getElementById('merchantOrderId').value;
+    var transactionType = document.getElementById('transactionType').value; // 获取交易类型的值
+
     if (!merchantOrderId) {
         alert('请输入商户订单号');
         return;
     }
 
-    var apiUrl = '/query_order/search?merchantOrderId=' + merchantOrderId;
+    // 修改API URL以包含交易类型参数
+    var apiUrl = '/query_order/search?merchantOrderId=' + merchantOrderId + '&transactionType=' + transactionType;
 
     fetch(apiUrl)
     .then(response => {
@@ -190,7 +202,7 @@ function searchOrder() {
         return response.json();
     })
     .then(data => {
-        displayOrderData(data);
+        displayOrderData(data,transactionType);
     })
     .catch(error => {
         console.error('Error:', error);
@@ -199,7 +211,8 @@ function searchOrder() {
 }
 
 
-function displayOrderData(orderData) {
+
+function displayOrderData(orderData,transactionType) {
     // 检查是否存在订单号
     if (!orderData.ref_trade_id) {
         document.getElementById('orderResult').innerHTML = '<p class="order-not-found">未找到订单</p>';
@@ -227,8 +240,52 @@ function displayOrderData(orderData) {
         </div>
     `;
 
+
+    // 根据订单类型构建不同的HTML结构
+    var orderDetailsHtml;
+    if (transactionType === "collect") {
+        var customerName = '未知';
+        if (orderData.customer && 'first_name' in orderData.customer && 'last_name' in orderData.customer) {
+            customerName = orderData.customer.first_name + ' ' + orderData.customer.last_name;
+        }
+        // 代收订单的HTML结构
+        orderDetailsHtml = `
+            <!-- 代收订单的详细信息 -->
+            <div class="order-details">
+                <table>
+                    <tr><th>订单号 (Order ID):</th><td>${orderData.ref_trade_id}</td></tr>
+                    <tr><th>金额 (Amount):</th><td>${orderData.amount} ${orderData.currency}</td></tr>
+                    <tr><th>手续费 (Fee):</th><td>${orderData.fee_amount}</td></tr>
+                    <tr><th>状态 (Status):</th><td>${orderData.status}</td></tr>
+                    <tr><th>客户姓名 (Customer Name):</th><td>${customerName}</td></tr>
+                    <tr><th>交易时间 (Transaction Time):</th><td>${new Date(parseInt(orderData.trans_at)).toLocaleString()}</td></tr>
+                    <tr><th>描述 (Description):</th><td>${orderData.description}</td></tr>
+                </table>
+            </div>
+        `;
+    } else if (transactionType === "disburse") {
+        // 代付订单的HTML结构
+        orderDetailsHtml = `
+            <div class="order-details">
+                <table>
+                    <tr><th>订单号 (Ref Trade ID):</th><td>${orderData.ref_trade_id}</td></tr>
+                    <tr><th>金额 (Amount):</th><td>${orderData.amount} ${orderData.currency}</td></tr>
+                    <tr><th>状态 (Status):</th><td>${orderData.status}</td></tr>
+                    <tr><th>银行账户名 (Bank Account Name):</th><td>${orderData.bank_account_name}</td></tr>
+                    <tr><th>银行账号 (Bank Account No):</th><td>${orderData.bank_account_no}</td></tr>
+                    <tr><th>失败原因 (Fail Reason):</th><td>${orderData.fail_reason || '无'}</td></tr>
+                    <tr><th>交易时间 (Transaction Time):</th><td>${new Date(parseInt(orderData.trans_at)).toLocaleString()}</td></tr>
+                    <tr><th>描述 (Description):</th><td>${orderData.description || '无'}</td></tr>
+                </table>
+            </div>
+        `;
+    } else {
+        // 未知订单类型的处理
+        orderDetailsHtml = '<p class="order-not-found">未知的订单类型</p>';
+    }
+
     // 将构建的 HTML 显示在页面上
-    document.getElementById('orderResult').innerHTML = orderDetails;
+    document.getElementById('orderResult').innerHTML = orderDetailsHtml;
 }
 
 function handleKeyPress(event) {

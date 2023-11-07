@@ -103,6 +103,47 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* 悬停时增加阴影 */
         }
         
+        /* 使表格水平滚动 */
+        .trade-record-details {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* 在小屏幕上调整搜索栏和分页按钮的布局 */
+        @media (max-width: 768px) {
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        
+            .search-container > * {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        
+            .pagination-buttons {
+                text-align: center;
+            }
+        
+            .trade-record-details table {
+                white-space: nowrap;
+            }
+        }
+        
+        /* 在更小的屏幕上进一步调整搜索栏 */
+        @media (max-width: 480px) {
+            .search-container {
+                padding: 0 15px;
+            }
+        
+            .pagination-buttons button,
+            .pagination-buttons span {
+                margin: 0 5px;
+                width: auto;
+            }
+        }
+
+        
     </style>
     
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -276,34 +317,42 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
-    <script>
-        // $(document).ready(function(){
-        //     $('.datepicker').datepicker({
-        //         format: 'yyyy-mm-dd',
-        //         autoclose: true
-        //     });
-        // });
-        var paginationInfo = {
-            startAfter: '',
-            endBefore: ''
-        };
-        var currentPage = 1; // 初始页码设置为 1
-        function updateCurrentPageDisplay() {
-            document.getElementById('currentPage').innerText = currentPage;
-        }
-        function fetchNextPage() {
-            currentPage++; // 增加页码
-            updateCurrentPageDisplay();
-            fetchTradeRecords(paginationInfo.startAfter, '');
-        }
-        
-        function fetchPreviousPage() {
-            if (currentPage > 1) currentPage--; // 减少页码
-            updateCurrentPageDisplay();
-            fetchTradeRecords('', paginationInfo.endBefore);
-        }
-        
-        $(document).ready(function () {
+<script>
+    var paginationInfo = {
+        startAfter: '',
+        endBefore: ''
+    };
+    var currentPage = 1; // 初始页码设置为 1
+
+    function updateCurrentPageDisplay() {
+        document.getElementById('currentPage').innerText = currentPage;
+    }
+
+    function fetchNextPage() {
+        disablePaginationButtons(); // 禁用按钮
+        currentPage++; // 增加页码
+        updateCurrentPageDisplay();
+        fetchTradeRecords(paginationInfo.startAfter, '');
+    }
+
+    function fetchPreviousPage() {
+        disablePaginationButtons(); // 禁用按钮
+        if (currentPage > 1) currentPage--; // 减少页码
+        updateCurrentPageDisplay();
+        fetchTradeRecords('', paginationInfo.endBefore);
+    }
+
+    function disablePaginationButtons() {
+        document.getElementById('prevPageButton').disabled = true;
+        document.getElementById('nextPageButton').disabled = true;
+    }
+
+    function enablePaginationButtons() {
+        document.getElementById('prevPageButton').disabled = false;
+        document.getElementById('nextPageButton').disabled = false;
+    }
+
+    $(document).ready(function () {
             var currentDate = new Date();
             var defaultStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), currentDate.getHours(), currentDate.getMinutes(), 0);
             var defaultEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), currentDate.getHours(), currentDate.getMinutes(), 0);
@@ -333,37 +382,50 @@
             });
             
             // 禁用上一页和下一页按钮
-            document.getElementById('prevPageButton').disabled = true;
-            document.getElementById('nextPageButton').disabled = true;
+            // document.getElementById('prevPageButton').disabled = true;
+            // document.getElementById('nextPageButton').disabled = true;
+        // ... 省略其他初始化代码 ...
+            disablePaginationButtons(); // 初始化时禁用分页按钮
             updateCurrentPageDisplay(); // 初始化页码显示
-        });
+    });
 
-        function fetchTradeRecords(startAfter = '', endBefore = '') {
-            var start = $('#datetimeStart').val();
-            var end = $('#datetimeEnd').val();
-            var status = $('#status').val();
-            var transactionType = $('#transactionType').val();
-            // var pageSize = 2; // 根据需要调整
-            // var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}&page_size=${pageSize}&start_after=${startAfter}&end_before=${endBefore}`;
-            var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}&start_after=${startAfter}&end_before=${endBefore}&transactionType=${transactionType}`;
-
-            fetch(apiUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log("Fetched Data:", data); // 添加调试语句
-                    displayTradeRecordData(data);
-                    updatePaginationButtons(data); // 新增调用
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('tradeRecordResult').innerHTML = '<p class="trade-record-not-found">未找到交易记录</p>';
-                });
+    function fetchTradeRecords(startAfter = '', endBefore = '') {
+        // 如果是新的搜索（即没有翻页参数），重置分页信息和页码
+        paginationInfo.startAfter = '';
+        paginationInfo.endBefore = '';
+        if (startAfter === '' && endBefore === '') {
+            currentPage = 1;
+            updateCurrentPageDisplay();
         }
+    
+        disablePaginationButtons(); // 禁用按钮以防止重复点击
+
+        var start = $('#datetimeStart').val();
+        var end = $('#datetimeEnd').val();
+        var status = $('#status').val();
+        var transactionType = $('#transactionType').val();
+        var apiUrl = `/trade_record/fetch?start=${start}&end=${end}&status=${status}&start_after=${startAfter}&end_before=${endBefore}&transactionType=${transactionType}`;
+
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }javascript:;
+                return response.json();
+            })
+            .then(data => {
+                displayTradeRecordData(data);
+                updatePaginationButtons(data); // 新增调用
+                enablePaginationButtons(); // 请求完成后重新启用按钮
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('tradeRecordResult').innerHTML = '<p class="trade-record-not-found">未找到交易记录</p>';
+                enablePaginationButtons(); // 即使发生错误也要重新启用按钮
+            });
+    }
+
+
 
         function displayTradeRecordData(tradeRecordData) {
             // 检查是否存在交易记录
