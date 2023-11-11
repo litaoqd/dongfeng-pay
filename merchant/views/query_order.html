@@ -167,6 +167,9 @@
                                 
                                                                 
                                 <button onclick="searchOrder()" class="btn btn-primary" style="margin-left: 15px;">搜索</button>
+                                <!-- 在查询按钮后添加 -->
+                                <!--<button id="generateReceiptBtn" class="btn btn-secondary" style="margin-left: 15px;" disabled onclick="generateReceipt()">生成回单</button>-->
+
                             </div>
                                 <div class="card-body">
                                     <div id="orderResult"></div>
@@ -179,6 +182,25 @@
         </div>
     </div>
 </div>
+
+<!-- 回单模板 -->
+<div id="receiptTemplate" style="display:none;">
+    <div class="receipt-container">
+        <div class="receipt-header">
+            <h2>付款回单</h2>
+        </div>
+        <div class="receipt-section">
+            <strong>订单号：</strong> <span id="receiptOrderId"></span><br>
+            <strong>金额：</strong> <span id="receiptAmount"></span><br>
+            <strong>付款日期：</strong> <span id="receiptDate"></span><br>
+            <!-- 添加更多需要的字段 -->
+        </div>
+        <div class="receipt-footer">
+            <p>感谢您使用我们的服务！</p>
+        </div>
+    </div>
+</div>
+
 <!-- JavaScript files-->
 {{template "template/js.html"}}
 <script>
@@ -208,6 +230,12 @@ function searchOrder() {
         console.error('Error:', error);
         document.getElementById('orderResult').innerHTML = '<p class="order-not-found">未找到订单</p>';
     });
+    
+    // 查询成功后
+    document.getElementById('generateReceiptBtn').disabled = false;
+    document.getElementById('generateReceiptBtn').classList.remove('btn-secondary');
+    document.getElementById('generateReceiptBtn').classList.add('btn-primary');
+
 }
 
 
@@ -286,6 +314,17 @@ function displayOrderData(orderData,transactionType) {
 
     // 将构建的 HTML 显示在页面上
     document.getElementById('orderResult').innerHTML = orderDetailsHtml;
+    
+    // 添加隐藏元素以存储订单ID和金额
+    var hiddenDetails = `
+        <div style="display: none;">
+            <span id="hiddenOrderId">${orderData.ref_trade_id}</span>
+            <span id="hiddenOrderAmount">${orderData.amount} ${orderData.currency}</span>
+        </div>
+    `;
+    document.getElementById('orderResult').innerHTML += hiddenDetails;
+    console.log("Hidden Order ID: " + document.getElementById('hiddenOrderId').innerText);
+    console.log("Hidden Order Amount: " + document.getElementById('hiddenOrderAmount').innerText);
 }
 
 function handleKeyPress(event) {
@@ -293,6 +332,80 @@ function handleKeyPress(event) {
         searchOrder();
     }
 }
+
+function generateReceipt() {
+    var transactionType = document.getElementById('transactionType').value;
+    var orderId = document.getElementById('hiddenOrderId').innerText;
+    var amount = document.getElementById('hiddenOrderAmount').innerText;
+    var date = new Date().toLocaleDateString();
+
+    // 获取回单模板
+    var receiptTemplate = document.getElementById('receiptTemplate').innerHTML;
+
+    // 根据交易类型动态生成回单内容
+    var receiptContent;
+    if (transactionType === 'collect') {
+        // 代收的回单内容
+        receiptContent = `
+            <strong>订单号：</strong> ${orderId}<br>
+            <strong>金额：</strong> ${amount}<br>
+            <strong>付款日期：</strong> ${date}<br>
+            <!-- ... 其他代收回单信息 ... -->
+        `;
+    } else if (transactionType === 'disburse') {
+        // 代付的回单内容
+        receiptContent = `
+            <strong>订单号：</strong> ${orderId}<br>
+            <strong>金额：</strong> ${amount}<br>
+            <strong>付款日期：</strong> ${date}<br>
+            <!-- ... 其他代付回单信息 ... -->
+        `;
+    }
+
+    // 创建一个新的 div 元素来显示回单
+    var receiptDiv = document.createElement('div');
+    receiptDiv.innerHTML = receiptTemplate;
+    receiptDiv.querySelector('.receipt-section').innerHTML = receiptContent; // 设置回单内容
+
+    // 添加下载和返回按钮
+    var buttonsHtml = `
+        <button onclick="downloadReceipt()" class="btn btn-primary">下载</button>
+        <button onclick="closeReceipt()" class="btn btn-secondary">返回</button>
+    `;
+    receiptDiv.querySelector('.receipt-footer').innerHTML += buttonsHtml;
+
+    // 添加样式以确保回单是可见的
+    applyReceiptStyles(receiptDiv);
+
+    document.body.appendChild(receiptDiv);
+}
+
+// 添加下载回单的功能
+function downloadReceipt() {
+    // ... 实现下载功能的代码 ...
+    alert('下载功能尚未实现。');
+}
+
+// 关闭回单显示
+function closeReceipt() {
+    var receiptDiv = document.querySelector('.receipt-container');
+    document.body.removeChild(receiptDiv);
+}
+
+// 应用回单样式
+function applyReceiptStyles(receiptDiv) {
+    receiptDiv.style.position = "fixed";
+    receiptDiv.style.top = "50px";
+    receiptDiv.style.left = "50px";
+    receiptDiv.style.backgroundColor = "white";
+    receiptDiv.style.border = "1px solid black";
+    receiptDiv.style.padding = "20px";
+    receiptDiv.style.zIndex = "1000"; // 确保在最上层
+}
+
+// 你可能还需要为按钮添加相应的样式，这取决于你的页面上已有的样式表
+
+
 
 </script>
 </body>

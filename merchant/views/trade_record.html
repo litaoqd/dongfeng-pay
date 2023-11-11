@@ -142,7 +142,13 @@
                 width: auto;
             }
         }
-
+       
+        .truncate {
+            max-width: 200px; /* Adjust this value as needed */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         
     </style>
     
@@ -441,7 +447,7 @@
 
             // 构建交易记录详情的 HTML 结构
             var tradeRecordDetails = '<div class="trade-record-details"><table>';
-            tradeRecordDetails += '<tr><th>商户交易 ID<br>(Merchant Trade ID)</th><th>金额<br>(Amount)</th><th>银行账户名<br>(Bank Account Name)</th><th>银行账号<br>(Bank Account No)</th><th>交易时间<br>(Transaction Time)</th><th>状态<br>(Status)</th></tr>';
+            tradeRecordDetails += '<tr><th>商户交易 ID<br>(Merchant Trade ID)</th><th>金额<br>(Amount)</th><th>银行账户名<br>(Bank Account Name)</th><th>银行账号<br>(Bank Account No)</th><th>交易时间<br>(Transaction Time)</th><th>状态<br>(Status)</th><th>失败原因<br>(Failure Reason)</th></tr>';
             tradeRecordData.data.forEach(function (item) {
                 var transTime = new Date(parseInt(item.trans_at)).toLocaleString();
                 tradeRecordDetails += `<tr>
@@ -451,6 +457,7 @@
             <td>${item.bank_account_no}</td>
             <td>${transTime}</td>
             <td>${item.status}</td>
+            <td>${item.fail_reason}</td>
         </tr>`;
             });
             tradeRecordDetails += '</table></div>';
