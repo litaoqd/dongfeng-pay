@@ -96,8 +96,10 @@ let index = {
                 $("#balanceAmt").text(response.cash_balance);
                 $("#amountFrozen").text(response.receivable_balance);
                 $("#balance").val(response.cash_balance);
-                // console.log("Balance Amount: ", response.cash_balance);
-                // console.log("Amount Frozen: ", response.receivable_balance);
+                $('#dailyReceivableAmt').text(response.channel_payable_balance);
+                $('#dailyPayableAmt').text(response.channel_settled_balance);
+                console.log("Balance Amount: ", response.channel_payable_balance);
+                console.log("Amount Frozen: ", response.channel_settled_balance);
             },
             error: function(error) {
                 console.log("Error fetching balance: ", error);

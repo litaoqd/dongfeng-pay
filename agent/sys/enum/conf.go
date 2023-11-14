@@ -29,6 +29,6 @@ const (
 // 提现限制金额
 const (
 	WithdrawalMaxAmount = 45000
-	WithdrawalMinAmount = 2
-	SettlementFee       = 2 // 提现单笔手续费
+	WithdrawalMinAmount = 100
+	SettlementFee       = 15 // 提现单笔手续费
 )
