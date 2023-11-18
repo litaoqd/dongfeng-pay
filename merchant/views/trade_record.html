@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    {{template "template/css.html"}}
-    <style>
+    <head>
+        {{template "template/css.html"}}
+        <style>
         .trade-record-details table {
             width: 100%;
             border-collapse: collapse;
@@ -149,181 +148,351 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        #detailsModal {
+            position: fixed; /* 确保模态窗口固定在视口内 */
+            z-index: 1050;   /* Bootstrap 默认值，足够高以确保在顶层 */
+            top: 50%;
+            left: 50%;
+            height: 800px;
+            transform: translate(-50%, -50%);
+        }
         
-    </style>
-    
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
+        .modal-dialog {
+            width: auto; /* 或者设定一个具体的宽度 */
+            max-width: 600px; /* 根据需要调整 */
+        }
         
-</head>
+        #detailsModal .modal-content {
+            background-color: white; /* 背景色 */
+            color: #333; /* 文字颜色 */
+            font-family: 'Arial', sans-serif; /* 字体 */
+            border-radius: 8px; /* 边框圆角 */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+        }
+        
+        #detailsModal .modal-header {
+            background-color: #007bff; /* 头部背景色 */
+            color: white; /* 头部文字颜色 */
+        }
+        
+        #detailsModal .modal-body {
+            padding: 20px; /* 内边距 */
+        }
+        
+        #detailsModal table {
+            width: 100%; /* 表格宽度 */
+            border-collapse: collapse; /* 边框合并 */
+            margin-bottom: 20px; /* 底部边距 */
+        }
+        
+        #detailsModal th,
+        #detailsModal td {
+            padding: 10px; /* 单元格内边距 */
+            border: 1px solid #ddd; /* 单元格边框 */
+        }
+        
+        #detailsModal .modal-footer {
+            border-top: 1px solid #ddd; /* 底部边框 */
+        }
+        
+        .print-button {
+            background-color: #4CAF50; /* 打印按钮背景色 */
+            color: white; /* 打印按钮文字颜色 */
+            padding: 10px 20px; /* 内边距 */
+            border: none; /* 无边框 */
+            border-radius: 4px; /* 边框圆角 */
+            cursor: pointer; /* 鼠标指针样式 */
+            transition: background-color 0.3s; /* 过渡效果 */
+        }
+        
+        .print-button:hover {
+            background-color: #45a049; /* 悬停时背景色 */
+        }
+        
+        @media print {
+            /* 打印样式 */
+            .modal-footer, .modal-header, .print-button {
+                display: none; /* 打印时隐藏 */
+            }
+        }
+        
+        /* 新增的回单样式类 */
+        .receipt-style {
+            border: 1px solid #ddd; /* 添加边框 */
+            background-color: #f9f9f9; /* 轻微的背景色 */
+            padding: 20px; /* 内边距 */
+            border-radius: 5px; /* 轻微的圆角 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+            margin: 10px; /* 外边距 */
+        }
+        
+        .status-succeeded {
+            background-color: #d4edda; /* 绿色背景 */
+            color: #155724; /* 深绿色文字 */
+        }
+        
+        .status-processing {
+            background-color: #fff3cd; /* 黄色背景 */
+            color: #856404; /* 深黄色文字 */
+        }
+        
+        .status-failed {
+            background-color: #f8d7da; /* 红色背景 */
+            color: #721c24; /* 深红色文字 */
+        }
+        
+        .status-default {
+            background-color: #f0f0f0; /* 默认背景颜色 */
+            color: #333; /* 默认文字颜色 */
+        }
+        /* 模态窗口头部布局样式 */
+        #detailsModal .modal-header {
+            display: flex; /* 使用 flex 布局 */
+            align-items: start; /* 元素顶部对齐 */
+            justify-content: space-between; /* 元素间隔开 */
+            background-color: #007bff; /* 背景色 */
+            color: white; /* 文字颜色 */
+            padding: 10px 20px; /* 内边距 */
+        }
+        
+        /* 标题样式 */
+        #detailsModal .modal-title {
+            flex-grow: 1; /* 让标题占据多余空间 */
+            text-align: center; /* 标题居中 */
+            font-family: 'Arial', sans-serif; /* 字体 */
+            font-size: 24px; /* 字体大小 */
+            font-weight: bold; /* 加粗 */
+            margin: 0; /* 移除默认外边距 */
+        }
+        
+        /* Logo 样式 */
+        #detailsModal .modal-logo {
+            width: 80px; /* Logo 宽度 */
+            height: auto; /* 高度自适应 */
+            position: absolute; /* 绝对定位 */
+            top: 10px; /* 距顶部距离 */
+            left: 20px; /* 距左侧距离 */
+        }
 
-<body>
-    <div class="page">
-        <!-- Main Navbar-->
-        {{template "template/header.html"}}
-        <div class="page-content d-flex align-items-stretch">
-            <!-- Side Navbar -->
-            <nav class="side-navbar">
-                <!-- Sidebar Header-->
-                <div class="sidebar-header d-flex align-items-center">
-                    <a href="/index/ui/">
-                        <div class="avatar">
-                            <img src="../../static/img/avatar-1.jpg" alt="..." class="img-fluid rounded-circle">
-                        </div>
-                    </a>
-                    <a href="#">
-                        <div class="title">
-                            <h1 class="h4">{{.userName}}</h1>
-                            <p>欢迎您！</p>
-                        </div>
-                    </a>
-                </div>
-                <!-- Sidebar Navidation Menus-->
-                <span class="heading">主菜单</span>
-                <ul class="list-unstyled">
-                    <li>
+        </style>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
+    </head>
+    <body>
+        <div class="page">
+            <!-- Main Navbar-->
+            {{template "template/header.html"}}
+            <div class="page-content d-flex align-items-stretch">
+                <!-- Side Navbar -->
+                <nav class="side-navbar">
+                    <!-- Sidebar Header-->
+                    <div class="sidebar-header d-flex align-items-center">
                         <a href="/index/ui/">
-                            <i class="icon-home"></i>
-                            首页
+                            <div class="avatar">
+                                <img src="../../static/img/avatar-1.jpg" alt="..." class="img-fluid rounded-circle">
+                            </div>
                         </a>
-                    </li>
-                    <li>
-                        <a href="#exampledropdownDropdown" aria-expanded="false" data-toggle="collapse">
-                            <i class="icon icon-user"></i>
-                            账户管理
+                        <a href="#">
+                            <div class="title">
+                                <h1 class="h4">{{.userName}}</h1>
+                                <p>欢迎您！</p>
+                            </div>
                         </a>
-                        <ul id="exampledropdownDropdown" class="collapse list-unstyled ">
-                            <li>
-                                <a href="/user_info/show_modify_ui">修改密码</a>
-                            </li>
-                            <li>
-                                <a href="/user_info/show_ui">账户资料</a>
-                            </li>
-                            <!--<li>-->
-                            <!--    <a href="/index/show_pay_way_ui">通道配置</a>-->
-                            <!--</li>-->
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#exampledropdownDropdown1" aria-expanded="true" data-toggle="collapse">
-                            <i class="icon icon-presentation"></i>
-                            订单管理
-                        </a>
-                        <ul id="exampledropdownDropdown1" class="list-unstyled ">
-                            <li>
-                                <a href="/query_order/ui">查询订单</a>
-                            </li>
-                            <li class="active">
-                                <a href="/trade/show_ui">订单记录</a>
-                            </li>
-                            <!--<li>-->
-                            <!--    <a href="/trade/show_complaint_ui">投诉列表</a>-->
-                            <!--</li>-->
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#exampledropdownDropdown2" aria-expanded="false" data-toggle="collapse">
-                            <i class="icon icon-bill"></i>
-                            财务管理
-                        </a>
-                        <ul id="exampledropdownDropdown2" class="collapse list-unstyled ">
-                            <li>
-                                <a href="/withdraw/show_ui">申请提现</a>
-                            </li>
-                            <!--<li>-->
-                            <!--    <a href="/multi_withdraw/show_multi_ui">批量申请提现</a>-->
-                            <!--</li>-->
-                            <li>
-                                <a href="/withdraw/show_list_ui">提现记录</a>
-                            </li>
-                            <!--{{/*-->
-                            <!--<li>-->
-                            <!--    <a href="/recharge/show_recharge_list_ui">自定义记录</a>-->
-                            <!--</li>-->
-                            <!--*/}}-->
-                            <!--<li>-->
-                            <!--    <a href="/history/show_history_list_ui">资产变动明细</a>-->
-                            <!--</li>-->
-                        </ul>
-                    </li>
-                    <li>
-                      <a href="/api_docs/apidoc.pdf" target="_blank">
-                        <i class="icon icon-interface-windows"></i>
-                        API文档
-                      </a>
-                    </li>
-                </ul>
-            </nav>
-            <div class="content-inner">
-                <!-- Page Header-->
-                <header class="page-header">
-                    <div class="container-fluid">
-                        <h2 class="no-margin-bottom">交易记录 - 请输入搜索条件，点击搜索查询</h2>
                     </div>
-                </header>
-                <!-- Forms Section-->
-                <section class="forms">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="card">
-                                    <div class="card-header d-flex align-items-center search-container">
-                                        <div class="d-flex align-items-center search-container">
-                                            <label class="start-time-label" for="datetimeStart">开始时间:</label>
-                                            <input type="text" id="datetimeStart"
-                                                class="form-control mr-3 datetime-input" placeholder="开始时间">
-                                            <label class="start-time-label" for="datetimeEnd">结束时间:</label>
-                                            <input type="text" id="datetimeEnd" class="form-control mr-3 datetime-input"
-                                                placeholder="结束时间">
-                                            <!-- ... 其他元素 ... -->
-                                            <!--<label class="start-time-label" for="transactionType">交易类型:</label>-->
-                                            <!--<select class="form-control mr-3 status-input" id="transactionType">-->
-                                            <!--    <option value="disburse">代付</option>-->
-                                            <!--    <option value="collect">代收</option>-->
-                                            <!--</select>-->
+                    <!-- Sidebar Navidation Menus-->
+                    <span class="heading">主菜单</span>
+                    <ul class="list-unstyled">
+                        <li>
+                            <a href="/index/ui/">
+                                <i class="icon-home"></i>
+                                首页
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#exampledropdownDropdown" aria-expanded="false" data-toggle="collapse">
+                                <i class="icon icon-user"></i>
+                                账户管理
+                            </a>
+                            <ul id="exampledropdownDropdown" class="collapse list-unstyled ">
+                                <li>
+                                    <a href="/user_info/show_modify_ui">修改密码</a>
+                                </li>
+                                <li>
+                                    <a href="/user_info/show_ui">账户资料</a>
+                                </li>
+                                <!--<li>-->
+                                <!--    <a href="/index/show_pay_way_ui">通道配置</a>-->
+                                <!--</li>-->
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#exampledropdownDropdown1" aria-expanded="true" data-toggle="collapse">
+                                <i class="icon icon-presentation"></i>
+                                订单管理
+                            </a>
+                            <ul id="exampledropdownDropdown1" class="list-unstyled ">
+                                <li>
+                                    <a href="/query_order/ui">查询订单</a>
+                                </li>
+                                <li class="active">
+                                    <a href="/trade/show_ui">订单记录</a>
+                                </li>
+                                <!--<li>-->
+                                <!--    <a href="/trade/show_complaint_ui">投诉列表</a>-->
+                                <!--</li>-->
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#exampledropdownDropdown2" aria-expanded="false" data-toggle="collapse">
+                                <i class="icon icon-bill"></i>
+                                财务管理
+                            </a>
+                            <ul id="exampledropdownDropdown2" class="collapse list-unstyled ">
+                                <li>
+                                    <a href="/withdraw/show_ui">申请提现</a>
+                                </li>
+                                <!--<li>-->
+                                <!--    <a href="/multi_withdraw/show_multi_ui">批量申请提现</a>-->
+                                <!--</li>-->
+                                <li>
+                                    <a href="/withdraw/show_list_ui">提现记录</a>
+                                </li>
+                                <!--{{/*-->
+                                <!--<li>-->
+                                <!--    <a href="/recharge/show_recharge_list_ui">自定义记录</a>-->
+                                <!--</li>-->
+                                <!--*/}}-->
+                                <!--<li>-->
+                                <!--    <a href="/history/show_history_list_ui">资产变动明细</a>-->
+                                <!--</li>-->
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="/api_docs/apidoc.pdf" target="_blank">
+                                <i class="icon icon-interface-windows"></i>
+                                API文档
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="content-inner">
+                    <!-- Page Header-->
+                    <header class="page-header">
+                        <div class="container-fluid">
+                            <h2 class="no-margin-bottom">交易记录 - 请输入搜索条件，点击搜索查询</h2>
+                        </div>
+                    </header>
+                    <!-- Forms Section-->
+                    <section class="forms">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-header d-flex align-items-center search-container">
+                                            <div class="d-flex align-items-center search-container">
+                                                <label class="start-time-label" for="datetimeStart">开始时间:</label>
+                                                <input
+                                                    type="text"
+                                                    id="datetimeStart"
+                                                    class="form-control mr-3 datetime-input"
+                                                    placeholder="开始时间"
+                                                >
+                                                <label class="start-time-label" for="datetimeEnd">结束时间:</label>
+                                                <input
+                                                    type="text"
+                                                    id="datetimeEnd"
+                                                    class="form-control mr-3 datetime-input"
+                                                    placeholder="结束时间"
+                                                >
+                                                <!-- ... 其他元素 ... -->
+                                                <!--<label class="start-time-label" for="transactionType">交易类型:</label>-->
+                                                <!--<select class="form-control mr-3 status-input" id="transactionType">-->
+                                                <!--    <option value="disburse">代付</option>-->
+                                                <!--    <option value="collect">代收</option>-->
+                                                <!--</select>-->
+                                            </div>
+                                            <label class="start-time-label" for="transactionType">交易类型:</label>
+                                            <select class="form-control mr-3 status-input" id="transactionType">
+                                                <option value="collect">代收</option>
+                                                <option value="disburse">代付</option>
+                                                <!-- ... 其他状态 ... -->
+                                            </select>
+                                            <select class="form-control mr-3 status-input" id="status">
+                                                <option value="">全部状态</option>
+                                                <option value="processing">处理中</option>
+                                                <option value="succeeded">交易成功</option>
+                                                <option value="failed">交易失败</option>
+                                                <option value="accounted">已入帐</option>
+                                                <!-- ... 其他状态 ... -->
+                                            </select>
+                                            <button onclick="fetchTradeRecords()" class="btn btn-primary">搜索</button>
                                         </div>
-                                        <label class="start-time-label" for="transactionType">交易类型:</label>
-                                        <select class="form-control mr-3 status-input" id="transactionType">
-                                                 <option value="collect">代收</option>
-                                                 <option value="disburse">代付</option>
-                                            <!-- ... 其他状态 ... -->
-                                        </select>
-                                        <select class="form-control mr-3 status-input" id="status">
-                                            <option value="">全部状态</option>
-                                            <option value="processing">处理中</option>
-                                            <option value="succeeded">交易成功</option>
-                                            <option value="failed">交易失败</option>
-                                            <option value="accounted">已入帐</option>
-                                            <!-- ... 其他状态 ... -->
-                                        </select>
-                                        <button onclick="fetchTradeRecords()" class="btn btn-primary">搜索</button>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="tradeRecordResult"></div>
-                                    </div>
-                                    <div class="pagination-buttons">
-                                    <!--<div>-->
+                                        <div class="card-body">
+                                            <div id="tradeRecordResult"></div>
+                                        </div>
+                                        <div class="pagination-buttons">
+                                            <!--<div>-->
                                             <button id="prevPageButton" onclick="fetchPreviousPage()">上一页</button>
-                                            <span id="currentPage">1</span> <!-- 用于显示当前页码 -->
+                                            <span id="currentPage">1</span>
+                                            <!-- 用于显示当前页码 -->
                                             <button id="nextPageButton" onclick="fetchNextPage()">下一页</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
+                </div>
             </div>
         </div>
-    </div>
-    <!-- JavaScript files-->
-    {{template "template/js.html"}}
-    <!-- 在其他 JavaScript 文件之前添加 jQuery 和 jQuery UI 的脚本 -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
-<script>
+        <div
+            class="modal"
+            id="detailsModal"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="detailsModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <!--<h5 class="modal-title" id="detailsModalLabel">交易详情 / Trade Details</h5>-->
+                        <!--<img src="../../static/img/logo.png" alt="Logo" style="width:100px; height:auto;">-->
+                        <img src="../../static/img/logo.png" alt="Logo" class="modal-logo">
+                        <h5 class="modal-title" id="detailsModalLabel">Transaction Receipt</h5>
+                        <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"
+                        >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="modal-content">
+                          <!-- 数据将显示在这里 -->
+                        </div>
+                        <!--在这里动态填充交易详情 -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="downloadPdf()">下载 PDF</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 在其他 JavaScript 文件之前添加 jQuery 和 jQuery UI 的脚本 -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+
+        <!-- JavaScript files-->
+        {{template "template/js.html"}}
+        <script>
     var paginationInfo = {
         startAfter: '',
         endBefore: ''
@@ -444,23 +613,66 @@
                 paginationInfo.startAfter = tradeRecordData.start_after;
                 paginationInfo.endBefore = tradeRecordData.end_before;
             }
-
+            
+            var transactionType = $('#transactionType').val();
             // 构建交易记录详情的 HTML 结构
             var tradeRecordDetails = '<div class="trade-record-details"><table>';
-            tradeRecordDetails += '<tr><th>商户交易 ID<br>(Merchant Trade ID)</th><th>金额<br>(Amount)</th><th>银行账户名<br>(Bank Account Name)</th><th>银行账号<br>(Bank Account No)</th><th>交易时间<br>(Transaction Time)</th><th>状态<br>(Status)</th><th>失败原因<br>(Failure Reason)</th></tr>';
-            tradeRecordData.data.forEach(function (item) {
-                var transTime = new Date(parseInt(item.trans_at)).toLocaleString();
-                tradeRecordDetails += `<tr>
-            <td>${item.ref_trade_id}</td>
-            <td>${item.amount} ${item.currency}</td>
-            <td>${item.bank_account_name}</td>
-            <td>${item.bank_account_no}</td>
-            <td>${transTime}</td>
-            <td>${item.status}</td>
-            <td>${item.fail_reason}</td>
-        </tr>`;
-            });
-            tradeRecordDetails += '</table></div>';
+            if (transactionType === 'collect') {
+                tradeRecordDetails += '<tr><th>商户交易 ID<br>(Merchant Trade ID)</th><th>金额<br>(Amount)</th><th>银行账户名<br>(Bank Account Name)</th><th>银行账号<br>(Bank Account No)</th><th>交易时间<br>(Transaction Time)</th><th>状态<br>(Status)</th><th>失败原因<br>(Failure Reason)</th><th>查看详情<br>View Details</th></tr>';
+                tradeRecordData.data.forEach(function (item) {
+                    var transTime = new Date(parseInt(item.trans_at)).toLocaleString();
+                    tradeRecordDetails += `<tr>
+                        <td>${item.ref_trade_id}</td>
+                        <td>${item.amount} ${item.currency}</td>
+                        <td>${item.bank_account_name}</td>
+                        <td>${item.bank_account_no}</td>
+                        <td>${transTime}</td>
+                        <td>${item.status}</td>
+                        <td>${item.fail_reason}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="showDetailsModal(
+                                '${item.id}',
+                                '${item.ref_trade_id}',
+                                '${item.amount} ${item.currency}',
+                                '${item.bank_account_name}',
+                                '${item.bank_account_no}',
+                                '${transTime}',
+                                '${item.status}',
+                                )">
+                                <i class="fa fa-wrench"></i> 查看
+                            </button>
+                        </td>
+                    </tr>`;
+                    });
+            } else if (transactionType === 'disburse') {
+                tradeRecordDetails += '<tr><th>商户交易 ID<br>(Merchant Trade ID)</th><th>金额<br>(Amount)</th><th>银行账户名<br>(Bank Account Name)</th><th>银行账号<br>(Bank Account No)</th><th>交易时间<br>(Transaction Time)</th><th>状态<br>(Status)</th><th>失败原因<br>(Failure Reason)</th><th>查看详情<br>View Details</th></tr>';
+                tradeRecordData.data.forEach(function (item) {
+                    var transTime = new Date(parseInt(item.trans_at)).toLocaleString();
+                    tradeRecordDetails += `<tr>
+                        <td>${item.ref_trade_id}</td>
+                        <td>${item.amount} ${item.currency}</td>
+                        <td>${item.bank_account_name}</td>
+                        <td>${item.bank_account_no}</td>
+                        <td>${transTime}</td>
+                        <td>${item.status}</td>
+                        <td>${item.fail_reason}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="showDetailsModal(
+                                '${item.id}',
+                                '${item.ref_trade_id}',
+                                '${item.amount} ${item.currency}',
+                                '${item.bank_account_name}',
+                                '${item.bank_account_no}',
+                                '${transTime}',
+                                '${item.status}',
+                                )">
+                                <i class="fa fa-wrench"></i> 查看
+                            </button>
+                        </td>
+                    </tr>`;
+                    });
+                }
+                tradeRecordDetails += '</table></div>';
 
             // 将构建的 HTML 显示在页面上
             document.getElementById('tradeRecordResult').innerHTML = tradeRecordDetails;
@@ -484,7 +696,117 @@
                 nextPageButton.disabled = false;
             }
         }
-    </script>
-</body>
+        function showDetailsModal(recordID, tradeid, amout, accountname, accountno, transtime, status) {
+            // 使用 AJAX 请求获取交易记录详情
+            // $.get('/trade/details/' + recordID, function(response) {
+                // 假设响应数据是 response
+                // 根据响应更新模态窗口内容
+                // ...
+                // console.log(recordID)
+                // 更新模态窗口内容
+                var statusClass = getStatusClass(status); // 获取状态对应的样式类
+                var modalContent = '<div class="receipt-style">';
+                modalContent += '<p>Sender name :  <br> <strong>OnePay</strong>' + ' </strong> </p>';
+                modalContent += '<p>Amount : <br> <strong>' + amout + ' </strong> </p>';
+                modalContent += '<p>Customer order number : <br> <strong>' + recordID + '</strong> </p>';
+                modalContent += '<p>Platform order number : </strong> <br> <strong><span class="platform-order-number">' + tradeid + '</span></strong> </p>';
+                modalContent += '<p>Bank Account Name: <br> <strong>' + accountname + '</strong> </p>';
+                modalContent += '<p>Bank Account No: <br> <strong>'  + accountno + '</strong> </p>';
+                modalContent += '<p>Transaction Time: <br> <strong>' + transtime + '</strong> </p>';
+                modalContent += '<p>Status:<br> <strong class="' + statusClass + '">'  + status + '</strong> </p>';
+                modalContent += '</div>';
+                
+                // 更新模态窗口中的内容
+                document.getElementById('modal-content').innerHTML = modalContent;
 
+                // 显示模态窗口
+                $('#detailsModal').modal('show');
+            // });
+        }
+        function getStatusClass(status) {
+            switch (status) {
+                case 'succeeded':
+                    return 'status-succeeded';
+                case 'processing':
+                    return 'status-processing';
+                case 'failed':
+                    return 'status-failed';
+                default:
+                    return 'status-default';
+            }
+        }
+        function downloadPdf() {
+            const modalContent = document.getElementById('modal-content');
+            const platformOrderNumber = modalContent.querySelector('.platform-order-number').innerText; // 获取平台订单号
+        
+            html2canvas(modalContent).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jspdf.jsPDF({
+                    orientation: "portrait",
+                    unit: "pt",
+                    format: "a4"
+                });
+        
+                // 加载Logo图像
+                const logoImg = new Image();
+                logoImg.src = '../../static/img/logo.png'; // 替换为Logo的实际路径
+                logoImg.onload = () => {
+                    // 计算保持长宽比的Logo尺寸
+                    const logoMaxWidth = 100; // Logo的最大宽度
+                    const logoAspectRatio = logoImg.width / logoImg.height;
+                    const logoWidth = logoMaxWidth;
+                    const logoHeight = logoWidth / logoAspectRatio;
+        
+                    // 绘制Logo
+                    const margin = 30;
+                    pdf.addImage(logoImg, 'PNG', margin, margin, logoWidth, logoHeight);
+        
+                    // 设置标题栏的高度和边距
+                    const titleBarHeight = 60;
+                    const title = "Transaction Receipt";
+                    const titleFontSize = 36;
+        
+                    // 设置常规文本的字体大小
+                    const textFontSize = 10;
+                    pdf.setFontSize(textFontSize);
+                    pdf.setFont("helvetica");
+        
+                    // 计算图像尺寸和位置
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    const imgProps = pdf.getImageProperties(imgData);
+                    const imgWidth = pdfWidth - 2 * margin;
+                    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+        
+                    // 计算标题和图像的整体高度
+                    const totalContentHeight = titleBarHeight + imgHeight;
+        
+                    // 计算标题和图像在页面中的垂直起始位置以居中显示
+                    const contentStartY = (pdfHeight - totalContentHeight) / 2;
+        
+                    // 添加标题
+                    pdf.setFontSize(titleFontSize);
+                    pdf.text(title, pdfWidth / 2, contentStartY + (titleBarHeight / 2), { align: "center" });
+        
+                    // 在标题栏下方添加横线
+                    const lineY = contentStartY + titleBarHeight;
+                    pdf.line(margin, lineY, pdfWidth - margin, lineY); // 添加分隔线
+        
+                    // 添加图像
+                    const imageStartY = lineY + 15;
+                    pdf.addImage(imgData, 'PNG', margin, imageStartY, imgWidth, imgHeight);
+        
+                    // 页脚信息
+                    const footerY = imageStartY + imgHeight + 15;
+                    // pdf.text("Company Address: 123 Street, City, Country", margin, footerY);
+                    pdf.line(margin, footerY + 5, pdfWidth - margin, footerY + 5); // 分隔线
+                    // pdf.text("Contact Us: (123) 456-7890 | info@company.com", margin, footerY + 15);
+        
+                    // 保存 PDF
+                    pdf.save(`${platformOrderNumber}.pdf`);
+                };
+            });
+        }
+        </script>
+    </body>
 </html>
