@@ -1,39 +1,232 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-    <title>收款页面</title>
-    <!-- 添加必要的样式和脚本 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Payment Page | 支付页面</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            text-align: center;
+        }
+        .header {
+            padding: 20px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 24px;
+        }
+        .payment-icons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .payment-icons img {
+            width: 80px;
+            margin: 0 15px;
+        }
+        .content {
+            padding: 20px;
+        }
+        #qrcode {
+            margin: 30px auto;
+            display: block;
+            max-width: 300px;
+            height: auto;
+            border: 8px solid #007bff; /* 更宽的蓝色边框 */
+            border-radius: 15px; /* 圆角边框 */
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.6); /* 添加阴影效果 */
+        }
+        .button {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 3px #999;
+            margin-top: 20px;
+        }
+        .button:hover { background-color: #218838 }
+        .button:active {
+            background-color: #1e7e34;
+            box-shadow: 0 1px #666;
+            transform: translateY(4px);
+        }
+        .instructions {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .instructions p {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .powered-by {
+            position: fixed;
+            right: 10px;
+            bottom: 10px;
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+        }
+        .trust-statement {
+            text-align: center;
+            margin-top: 15px;
+            color: #007bff;
+            font-weight: bold;
+            font-size: 14px; /* 减小字号以适应手机屏幕 */
+            line-height: 1.4; /* 调整行高以改善可读性 */
+            background-color: #f0f0f0; /* 轻微的背景色 */
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .trust-statement p {
+            margin: 5px 0;
+        }
+
+        .trust-statement hr {
+            width: 80%;
+            border-color: #007bff;
+        }
+
+        /* 新增媒体查询以优化移动设备的显示 */
+        @media screen and (max-width: 768px) {
+            .trust-statement {
+                font-size: 12px; /* 在较小屏幕上进一步减小字号 */
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="qrcode"></div>
-    <script>
-        // JavaScript代码来请求二维码图片
-        var token = new URLSearchParams(window.location.search).get('token');
-        console.log("获取的token: ", token); // 打印token值
+    <div class="header" id="headerTitle">
+        QRCode | 支付二维码
+    </div>
+    <!-- 新增的信任和专业性声明 -->
+    <!-- <div class="trust-statement">
+        <hr>
+        <p id="trustStatement">安全 · 可靠 · 便捷 - 您的支付，我们的承诺</p>
+    </div> -->
+    <div class="payment-icons">
+        <img src="../static/img/gcash.png" alt="Gcash">
+        <img src="../static/img/paymaya.png" alt="Paymaya">
+        <img src="../static/img/grab.png" alt="Grab">
+    </div>
 
+    <hr> 
+    <div class="trust-statement">
+        <p id="trustStatement">安全 · 可靠 · 便捷 - 您的支付，我们的承诺</p>
+    </div>
+    
+    <div class="content">
+        <div id="qrcode"></div>
+        <button class="button" id="downloadBtn">Download QR Code | 下载二维码</button>
+        <!-- <p class="instructions">
+            Please scan the QR code above to make a payment, or click the button to save the QR code. |
+            请扫描上方的二维码进行支付，或点击按钮保存二维码。
+        </p> -->
+        <div class="instructions" id="instructions">
+            <!-- 指令文本将通过 JavaScript 设置 -->
+        </div>
+    </div>
+    <!-- <div class="footer">
+        <p>© 2023 OnePay. All rights reserved.</p>
+        <p>Contact Us | Privacy Policy</p>
+    </div> -->
+    <div class="powered-by">
+        © 2023 OnePay. All rights reserved. Powered by QRPH
+    </div>
+
+    <script>
+        var token = new URLSearchParams(window.location.search).get('token');
         if (token) {
-            console.log("开始请求二维码图片"); // 开始请求前的日志
             fetch('/get_qrcode?token=' + token)
-                .then(response => {
-                    console.log("请求响应: ", response); // 打印响应对象
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log("请求数据: ", data); // 打印请求到的数据
                     if (data.qrcodePath) {
                         var img = document.createElement('img');
                         img.src = data.qrcodePath;
+                        img.alt = '支付二维码';
                         document.getElementById('qrcode').appendChild(img);
-                    } else {
-                        console.log("未找到二维码路径"); // 如果没有二维码路径
+
+                        // 下载按钮事件
+                        document.getElementById('downloadBtn').addEventListener('click', function() {
+                            downloadImage(data.qrcodePath);
+                        });
                     }
-                })
-                .catch(error => {
-                    console.error("请求二维码图片时发生错误: ", error); // 捕获并打印任何错误
                 });
-        } else {
-            console.log("未获取到token"); // 如果没有token
         }
+
+        function downloadImage(url) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.responseType = 'blob';
+            xhr.onload = function() {
+                var urlCreator = window.URL || window.webkitURL;
+                var imageUrl = urlCreator.createObjectURL(this.response);
+                var tag = document.createElement('a');
+                tag.href = imageUrl;
+                tag.download = 'qrcode.png';
+
+                document.body.appendChild(tag);
+                tag.click();
+                document.body.removeChild(tag);
+            };
+            xhr.send();
+        }
+
+        function getBrowserLanguage() {
+            var language = navigator.language || navigator.userLanguage; 
+            return language.toLowerCase();
+        }
+
+        function updateLanguage() {
+            var language = getBrowserLanguage();
+            var pageTitle = document.getElementById('pageTitle');
+            var headerTitle = document.getElementById('headerTitle');
+            var instructionsElement = document.getElementById('instructions');
+            var downloadButton = document.getElementById('downloadBtn');
+
+            if (language.includes('zh')) {
+                pageTitle.innerHTML = '支付页面';
+                headerTitle.innerHTML = '支付二维码';
+                downloadButton.innerHTML = '下载二维码';
+                instructionsElement.innerHTML = '<p>请保存或截屏此二维码，然后打开 GCash 应用。在 GCash 应用中，选择“扫描二维码”功能，并上传保存的二维码图片或截屏，以完成支付。</p>';
+            } else if (language.includes('tl') || language.includes('fil')) {
+                pageTitle.innerHTML = 'Pahina ng Pagbabayad';
+                headerTitle.innerHTML = 'QR Code para sa Pagbabayad';
+                downloadButton.innerHTML = 'I-download ang QR Code';
+                instructionsElement.innerHTML = '<p>Mangyaring i-save o i-screenshot ang QR code na ito, pagkatapos ay buksan ang GCash app. Sa GCash app, piliin ang tampok na "Mag-scan ng QR Code" at i-upload ang nai-save na imahe ng QR code o screenshot upang makumpleto ang pagbabayad.</p>';
+            } else {
+                pageTitle.innerHTML = 'Payment Page';
+                headerTitle.innerHTML = 'QR Code for Payment';
+                downloadButton.innerHTML = 'Download QR Code';
+                instructionsElement.innerHTML = '<p>Please save or screenshot this QR code, then open the GCash app. In the GCash app, select the "Scan QR Code" feature and upload the saved QR code image or screenshot to complete the payment.</p>';
+            }
+            var trustStatement = document.getElementById('trustStatement');
+            if (language.includes('zh')) {
+                // 中文
+                trustStatement.innerHTML = '安全 · 可靠 · 便捷 - 您的支付，我们的承诺';
+            } else if (language.includes('tl') || language.includes('fil')) {
+                // 菲律宾语
+                trustStatement.innerHTML = 'Ligtas · Mapagkakatiwalaan · Maginhawa - Ang inyong pagbabayad, aming pangako';
+            } else {
+                // 英文
+                trustStatement.innerHTML = 'Secure · Reliable · Convenient - Your Payment, Our Commitment';
+            }
+        }
+        updateLanguage();
     </script>
 </body>
 </html>
