@@ -1,8 +1,9 @@
 package routers
 
 import (
-	"github.com/beego/beego/v2/server/web"
 	"shop/controllers"
+
+	"github.com/beego/beego/v2/server/web"
 )
 
 func init() {
@@ -14,5 +15,7 @@ func init() {
 	web.Router("/error.html", &controllers.HomeAction{}, "*:ErrorPage")
 	web.SetStaticPath("/payment_result.html", "static/payment_result.html")
 	web.Router("/check_payment_status", &controllers.PayController{}, "get:CheckPaymentStatus")
+	// 使用Beego的方式添加checkout路由
+	web.Router("/checkout", &controllers.CheckoutController{}, "post:CheckoutHandler")
 
 }

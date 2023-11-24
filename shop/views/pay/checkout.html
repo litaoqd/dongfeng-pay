@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>收款页面</title>
+    <!-- 添加必要的样式和脚本 -->
+</head>
+<body>
+    <div id="qrcode"></div>
+    <script>
+        // JavaScript代码来请求二维码图片
+        var token = new URLSearchParams(window.location.search).get('token');
+        if (token) {
+            fetch('/get_qrcode?token=' + token)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.qrcodePath) {
+                        var img = document.createElement('img');
+                        img.src = data.qrcodePath;
+                        document.getElementById('qrcode').appendChild(img);
+                    }
+                });
+        }
+    </script>
+</body>
+</html>
