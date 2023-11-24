@@ -62,6 +62,16 @@ func (c *CheckoutController) GetQRCode() {
 }
 
 func (c *CheckoutController) CheckoutHandler() {
+	// 获取请求头中的 Authorization 字段
+	authHeader := c.Ctx.Request.Header.Get("Authorization")
+	expectedToken := "Bearer onepaycheckout"
+
+	// 检查 Authorization 头是否匹配预期的 Token
+	if authHeader != expectedToken {
+		c.sendJSONError(http.StatusUnauthorized, "Authentication failed")
+		return
+	}
+
 	// 读取请求体
 	body, err := ioutil.ReadAll(c.Ctx.Request.Body)
 	if err != nil {
@@ -142,5 +152,11 @@ func (c *CheckoutController) CheckoutHandler() {
 
 	// 返回JSON给OnePay
 	json.NewEncoder(c.Ctx.ResponseWriter).Encode(response)
+}
 
+// sendJSONError 发送JSON格式的错误响应
+func (c *CheckoutController) sendJSONError(statusCode int, message string) {
+	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
+	c.Ctx.ResponseWriter.WriteHeader(statusCode)
+	json.NewEncoder(c.Ctx.ResponseWriter).Encode(map[string]string{"error": message})
 }
