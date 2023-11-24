@@ -128,5 +128,19 @@ func (c *CheckoutController) CheckoutHandler() {
 	log.Printf("Checkout URL generated: %s\n", responseURL)
 
 	// 返回URL给OnePay
-	c.Ctx.WriteString(responseURL)
+	// c.Ctx.WriteString(responseURL)
+
+	// 构建返回给OnePay的JSON对象
+	response := map[string]string{
+		"url":   responseURL,
+		"token": token,
+	}
+
+	// 设置响应类型为JSON
+	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
+	c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
+
+	// 返回JSON给OnePay
+	json.NewEncoder(c.Ctx.ResponseWriter).Encode(response)
+
 }
