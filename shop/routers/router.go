@@ -17,5 +17,7 @@ func init() {
 	web.Router("/check_payment_status", &controllers.PayController{}, "get:CheckPaymentStatus")
 	// 使用Beego的方式添加checkout路由
 	web.Router("/checkout", &controllers.CheckoutController{}, "post:CheckoutHandler")
+	web.Router("/checkout.html", &controllers.CheckoutController{}, "*:CheckoutRender")
+	web.Router("/get_qrcode", &controllers.CheckoutController{}, "get:GetQRCode")
 
 }

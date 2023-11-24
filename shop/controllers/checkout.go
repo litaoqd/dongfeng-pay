@@ -26,6 +26,41 @@ type CheckoutRequest struct {
 	ReturnURL     string `json:"return_url"`
 }
 
+func (c *CheckoutController) CheckoutRender() {
+	// 添加逻辑来准备数据
+	c.TplName = "pay/checkout.html" // 确保这里的路径是正确的
+}
+
+func (c *CheckoutController) GetQRCode() {
+	token := c.GetString("token")
+	logs.Info("Received request for QR code with token:", token)
+
+	// 从数据库获取二维码信息
+	qrCodeRecord, err := models.GetQRCodeRecordByToken(token)
+	if err != nil {
+		logs.Error("QR code not found for token:", token, "Error:", err)
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusNotFound)
+		c.Ctx.WriteString("Not Found")
+		return
+	}
+
+	// 从配置文件获取 qrCodeGetPath
+	qrCodeGetPath, err := web.AppConfig.String("qrCodeGetPath")
+	if err != nil {
+		logs.Error("Error retrieving qrCodeGetPath from config:", err)
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+		c.Ctx.WriteString("Internal Server Error")
+		return
+	}
+
+	// 拼接完整的二维码路径
+	fullQRCodePath := qrCodeGetPath + "/" + qrCodeRecord.QRCodePath
+	logs.Info("Full QR code path:", fullQRCodePath)
+
+	c.Data["json"] = map[string]string{"qrcodePath": fullQRCodePath}
+	c.ServeJSON()
+}
+
 func (c *CheckoutController) CheckoutHandler() {
 	// 读取请求体
 	body, err := ioutil.ReadAll(c.Ctx.Request.Body)

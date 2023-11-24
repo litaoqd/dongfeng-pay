@@ -9,16 +9,30 @@
     <script>
         // JavaScript代码来请求二维码图片
         var token = new URLSearchParams(window.location.search).get('token');
+        console.log("获取的token: ", token); // 打印token值
+
         if (token) {
+            console.log("开始请求二维码图片"); // 开始请求前的日志
             fetch('/get_qrcode?token=' + token)
-                .then(response => response.json())
+                .then(response => {
+                    console.log("请求响应: ", response); // 打印响应对象
+                    return response.json();
+                })
                 .then(data => {
+                    console.log("请求数据: ", data); // 打印请求到的数据
                     if (data.qrcodePath) {
                         var img = document.createElement('img');
                         img.src = data.qrcodePath;
                         document.getElementById('qrcode').appendChild(img);
+                    } else {
+                        console.log("未找到二维码路径"); // 如果没有二维码路径
                     }
+                })
+                .catch(error => {
+                    console.error("请求二维码图片时发生错误: ", error); // 捕获并打印任何错误
                 });
+        } else {
+            console.log("未获取到token"); // 如果没有token
         }
     </script>
 </body>

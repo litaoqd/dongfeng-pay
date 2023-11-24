@@ -45,7 +45,7 @@ func GenerateQRCode(content string) (string, error) {
 	}
 
 	log.Println("QR code generated successfully")
-	return qrCodePath, nil
+	return qrCodeFileName, nil
 }
 
 // GenerateToken 生成一个随机的令牌字符串
