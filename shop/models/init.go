@@ -10,7 +10,9 @@
 package models
 
 import (
+	"flag"
 	"fmt"
+	"log"
 
 	"github.com/beego/beego/v2/adapter/orm"
 	"github.com/beego/beego/v2/core/logs"
@@ -19,13 +21,20 @@ import (
 )
 
 // 假设 ConfPath 是在 main.go 中定义的全局变量
+var ConfPath string
+
 func init() {
+	// 定义命令行参数
+	var ConfPath string
+	flag.StringVar(&ConfPath, "conf", "./conf/app.conf", "config file path")
+	flag.Parse()
+
+	fmt.Println("models ConfPath:", ConfPath)
+
 	// 加载 INI 配置文件
-	fmt.Println("ConfPath:", ConfPath)
 	cfg, err := ini.Load(ConfPath)
 	if err != nil {
-		logs.Error("Fail to read file: %v", err)
-		return
+		log.Fatalf("Fail to read file: %v", err)
 	}
 
 	// 从配置文件读取数据库配置
@@ -41,6 +50,7 @@ func init() {
 
 	_ = orm.RegisterDriver("mysql", orm.DRMySQL)
 	_ = orm.RegisterDataBase("default", "mysql", link, 30, 30)
+
 	// 注册qrcodes表
 	orm.RegisterModel(new(QrCodes))
 }

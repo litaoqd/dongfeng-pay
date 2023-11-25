@@ -1,34 +1,13 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	"log"
 	_ "shop/routers"
 
 	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
-	"gopkg.in/ini.v1"
 )
 
-var ConfPath string
-
 func main() {
-	// 定义命令行参数
-	flag.StringVar(&ConfPath, "conf", "./conf/app.conf", "config file path")
-	flag.Parse()
-
-	fmt.Println("ConfPath:", ConfPath)
-
-	// 加载 INI 配置文件
-	cfg, err := ini.Load(ConfPath)
-	if err != nil {
-		log.Fatalf("Fail to read file: %v", err)
-	}
-
-	// 示例：读取一个配置项
-	someConfigValue := cfg.Section("mysql").Key("dbbase").String()
-	fmt.Println("DBBase:", someConfigValue)
 	RegisterLogs()
 	beego.Run()
 }
