@@ -14,16 +14,26 @@ import (
 
 	"github.com/beego/beego/v2/adapter/orm"
 	"github.com/beego/beego/v2/core/logs"
-	"github.com/beego/beego/v2/server/web"
 	_ "github.com/go-sql-driver/mysql"
+	"gopkg.in/ini.v1"
 )
 
+// 假设 ConfPath 是在 main.go 中定义的全局变量
 func init() {
-	dbHost, _ := web.AppConfig.String("mysql::dbhost")
-	dbUser, _ := web.AppConfig.String("mysql::dbuser")
-	dbPassword, _ := web.AppConfig.String("mysql::dbpasswd")
-	dbBase, _ := web.AppConfig.String("mysql::dbbase")
-	dbPort, _ := web.AppConfig.String("mysql::dbport")
+	// 加载 INI 配置文件
+	fmt.Println("ConfPath:", ConfPath)
+	cfg, err := ini.Load(ConfPath)
+	if err != nil {
+		logs.Error("Fail to read file: %v", err)
+		return
+	}
+
+	// 从配置文件读取数据库配置
+	dbHost := cfg.Section("mysql").Key("dbhost").String()
+	dbUser := cfg.Section("mysql").Key("dbuser").String()
+	dbPassword := cfg.Section("mysql").Key("dbpasswd").String()
+	dbBase := cfg.Section("mysql").Key("dbbase").String()
+	dbPort := cfg.Section("mysql").Key("dbport").String()
 
 	link := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", dbUser, dbPassword, dbHost, dbPort, dbBase)
 
@@ -31,6 +41,6 @@ func init() {
 
 	_ = orm.RegisterDriver("mysql", orm.DRMySQL)
 	_ = orm.RegisterDataBase("default", "mysql", link, 30, 30)
-	//注册qrcodes表
+	// 注册qrcodes表
 	orm.RegisterModel(new(QrCodes))
 }

@@ -10,4 +10,5 @@ require (
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/widuu/gojson v0.0.0-20170212122013-7da9d2cd949b
+	gopkg.in/ini.v1 v1.67.0 // indirect
 )
