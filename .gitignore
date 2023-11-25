@@ -11,6 +11,7 @@
 *.bin
 *.pid
 *.swp
+*.conf
 .DS_Store
 
 # IDE和编辑器特定文件
