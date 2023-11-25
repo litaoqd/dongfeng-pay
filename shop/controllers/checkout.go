@@ -99,7 +99,7 @@ func (c *CheckoutController) CheckoutHandler() {
 	log.Printf("Received checkout request: qrCodeContent=%s, createTime=%s, orderID=%s, merchantID=%s, returnUrl=%s\n", qrCodeContent, createTime, orderID, merchantID, returnUrl)
 
 	// 生成二维码图片并保存
-	qrCodePath, err := utils.GenerateQRCode(qrCodeContent)
+	qrCodePath, token, err := utils.GenerateQRCode(qrCodeContent)
 	if err != nil {
 		log.Printf("Error generating QR code: %v\n", err)
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
@@ -107,12 +107,12 @@ func (c *CheckoutController) CheckoutHandler() {
 	}
 
 	// 生成Token
-	token, err := utils.GenerateToken()
-	if err != nil {
-		log.Printf("Error generating token: %v\n", err)
-		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	// token, err := utils.GenerateToken()
+	// if err != nil {
+	// 	log.Printf("Error generating token: %v\n", err)
+	// 	c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+	// 	return
+	// }
 
 	// 存储信息到数据库
 	qrCodeRecord := models.QrCodes{

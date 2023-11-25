@@ -21,7 +21,7 @@ func ensureDir(dirName string) {
 	}
 }
 
-func GenerateQRCode(content string) (string, error) {
+func GenerateQRCode(content string) (string, string, error) {
 	// 从配置文件获取存储路径
 	storagePath, _ := config.String("qrCodeStoragePath")
 	log.Printf("QR Code storage path: %s\n", storagePath)
@@ -30,22 +30,34 @@ func GenerateQRCode(content string) (string, error) {
 	token, err := GenerateToken() // 修改这里
 	if err != nil {
 		log.Printf("Error generating token for QR code file name: %v\n", err)
-		return "", err // 处理 GenerateToken 的错误
+		return "", "", err // 处理 GenerateToken 的错误
 	}
 	qrCodeFileName := "qrcode_" + token + ".png"
 	qrCodePath := filepath.Join(storagePath, qrCodeFileName)
 	log.Printf("Generated QR code file path: %s\n", qrCodePath)
 
 	// 生成二维码
-	ensureDir(storagePath)
-	err = qrcode.WriteFile(content, qrcode.Medium, 256, qrCodePath)
-	if err != nil {
-		log.Printf("Error generating QR code: %v\n", err)
-		return "", err
-	}
+	// ensureDir(storagePath)
+	// err = qrcode.WriteFile(content, qrcode.Medium, 256, qrCodePath)
+	// if err != nil {
+	// 	log.Printf("Error generating QR code: %v\n", err)
+	// 	return "", "", err
+	// }
+
+	// 在新的 goroutine 中生成并保存二维码
+	go func() {
+		ensureDir(storagePath)
+		err := qrcode.WriteFile(content, qrcode.Medium, 256, qrCodePath)
+		if err != nil {
+			log.Printf("Error generating QR code: %v\n", err)
+			// 处理错误，例如通过通道发送错误信息或记录错误
+		} else {
+			log.Println("QR code generated successfully")
+		}
+	}()
 
 	log.Println("QR code generated successfully")
-	return qrCodeFileName, nil
+	return qrCodeFileName, token, nil
 }
 
 // GenerateToken 生成一个随机的令牌字符串
