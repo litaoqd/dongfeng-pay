@@ -1,64 +1,133 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
-<!--[if IE 7]> <html class="lt-ie9 lt-ie8" lang="en"> <![endif]-->
-<!--[if IE 8]> <html class="lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!-->
 <html lang="en">
-<!--<![endif]-->
-
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>管理后台系统</title>
-    <link rel="stylesheet" href="../static/css/login.css">
-    <script src="../static/js/jquery.min.js"></script>
-    <script src="../static/js/filter.js"></script>
-    <!--[if lt IE 9]><script src="../static/js/html5.js"></script><![endif]-->
-</head>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
 
+        .container {
+            width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .login h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            font-size: small;
+            margin-left: 10px;
+        }
+
+        .verify-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .verifyImg {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #loginForm {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+    <script src="../static/js/jquery.min.js"></script>
+</head>
 <body>
     <section class="container">
         <div class="login">
             <h1>管理员登录</h1>
-
-            <p><input type="text" name="login" class="userID" value="" placeholder="注册手机号"></p>
-            <div class="userIDERROR" style="color: red;margin-left: 10px; font-size: small"></div>
-            <p><input type="password" name="password" class="passwd" value="" placeholder="密码"></p>
-            <div class="passwdDERROR" style="color: red;margin-left: 10px; font-size: small"></div>
-            <div class="verify">
-                <div class="left_f">
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="text" name="login" class="userID" placeholder="注册手机号">
+                    <div class="userIDERROR error-message"></div>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" class="passwd" placeholder="密码">
+                    <div class="passwdDERROR error-message"></div>
+                </div>
+                <div class="form-group verify-group">
                     <input type="text" class="verifyText" placeholder="验证码">
-                    <div class="CodeDERROR" style="color: red;margin-left: 10px; font-size: small"></div>
+                    <img class="verifyImg" src="" alt="验证码">
+                    <div class="CodeDERROR error-message"></div>
                 </div>
-                <div class="right_f">
-                    <img class="verifyImg" src="" ALT="">
+                <div class="form-group remember-me">
+                    <label>
+                        <input type="checkbox" name="remember_me" id="remember_me">
+                        记住密码
+                    </label>
                 </div>
-            </div>
-            <div class="remember_me">
-                <label>
-            <input type="checkbox" name="remember_me" id="remember_me">
-            记住密码
-          </label>
-            </div>
-            <div class="submit"><input type="submit" id="login" name="commit" value="登录"></div>
+                <div class="form-group">
+                    <input type="submit" id="login" name="commit" value="登录">
+                </div>
+            </form>
         </div>
     </section>
     <script>
-        //页面展示自动加载验证码
-        $(".verifyImg").attr("src", "/getVerifyImg?rand=" + new Date().getTime());
-        //注册用户点击验证，更换验证码图片
-        var flushCode = function() {
-            let verifyImg = $(".verifyImg");
-            verifyImg.click(function() {
-                verifyImg.attr("src","/getVerifyImg?rand=" + new Date().getTime());
-            });
-        }
+        $(document).ready(function() {
+            $(".verifyImg").attr("src", "/getVerifyImg?rand=" + new Date().getTime());
 
-        flushCode();
-        //点击登录按钮，进行用户登录操作
-        $("#login").click(function() {
-            login();
-        });
+            $(".verifyImg").click(function() {
+                $(this).attr("src", "/getVerifyImg?rand=" + new Date().getTime());
+            });
+
+            $("#loginForm").on('submit', function(event) {
+                event.preventDefault();
+                login();
+            });
 
         function login() {
             let userID = $.trim($(".userID").val());
