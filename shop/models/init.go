@@ -21,18 +21,17 @@ import (
 )
 
 // 假设 ConfPath 是在 main.go 中定义的全局变量
-var ConfPath string
 
 func init() {
 	// 定义命令行参数
-	var ConfPath string
-	flag.StringVar(&ConfPath, "conf", "./conf/app.conf", "config file path")
+	var confPath string
+	flag.StringVar(&confPath, "conf", "./conf/app.conf", "config file path")
 	flag.Parse()
 
-	fmt.Println("models ConfPath:", ConfPath)
+	fmt.Println("models ConfPath:", confPath)
 
 	// 加载 INI 配置文件
-	cfg, err := ini.Load(ConfPath)
+	cfg, err := ini.Load(confPath)
 	if err != nil {
 		log.Fatalf("Fail to read file: %v", err)
 	}
