@@ -1,8 +1,9 @@
 # 编译生成的二进制文件
-/boss
-/gateway
-/merchant
-/shop
+boss/boss
+merchant/merchant
+shop/shop
+Agent/agent
+Logs/
 
 # 其他常见忽略项
 *.log
