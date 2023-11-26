@@ -4,6 +4,7 @@ merchant/merchant
 shop/shop
 Agent/agent
 Logs/
+shop/static/qrcodes/
 
 # 其他常见忽略项
 *.log
