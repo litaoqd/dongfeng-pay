@@ -1,0 +1,27 @@
+# 编译生成的二进制文件
+boss/boss
+merchant/merchant
+shop/shop
+agent/agent
+logs/
+shop/static/qrcodes/
+
+# 其他常见忽略项
+*.log
+*.out
+*.exe
+*.bin
+*.pid
+*.swp
+*.conf
+.DS_Store
+
+# IDE和编辑器特定文件
+/.idea/
+*.iml
+.vscode/
+
+# 测试覆盖率文件
+/coverage.out
+
+# 更多规则...
