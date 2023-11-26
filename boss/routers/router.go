@@ -2,6 +2,7 @@ package routers
 
 import (
 	"boss/controllers"
+
 	"github.com/beego/beego/v2/server/web"
 )
 
@@ -107,4 +108,6 @@ func init() {
 	web.Router("/result/payfor", &controllers.UpdateController{}, "*:ResultPayFor")
 	web.Router("/send/notify", &controllers.SendNotify{}, "*:SendNotifyToMerchant")
 	web.Router("/self/send/notify", &controllers.SendNotify{}, "*:SelfSendNotify")
+	web.Router("/api/getAllMerchantsData", &controllers.MainController{}, "get:GetAllMerchantsData")
+
 }

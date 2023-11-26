@@ -1,14 +1,178 @@
-<!doctype html>
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-	<meta charset="utf-8">
-	<title></title>
-	<script src="../static/js/filter.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>监控面板</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .container {
+            padding: 20px;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            padding: 20px;
+            position: relative;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .error {
+            background-color: #ffcccb;
+            color: #d9534f;
+        }
+        .refresh-time {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+        }
+        .column-sum {
+            text-align: right;
+            font-weight: bold;
+            background-color: #f2f2f2;
+        }
+        .column-total td {
+            padding: 15px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-	
-</div>
+    <div class="header">监控面板</div>
+    <div class="container">
+        <div class="card">
+            <span class="refresh-time" id="refresh-time">数据最后刷新时间：-</span>
+            <h2>商户收付款数据</h2>
+            <table id="merchant-data">
+                <thead>
+                    <tr>
+                        <th>商户名称</th>
+                        <th>商户余额</th>
+                        <th>在途金额</th>
+                        <th>待结算金额</th>
+                        <th>当日收款累计</th>
+                        <th>当日付款累计</th>
+                    </tr>
+                </thead>
+                <tbody id="merchant-data-body">
+                    <!-- 数据将通过 JavaScript 动态填充 -->
+                </tbody>
+                <tfoot>
+                    <tr class="column-total">
+                        <td>合计</td>
+                        <td id="column-sum-1">0.00</td>
+                        <td id="column-sum-2">0.00</td>
+                        <td id="column-sum-3">0.00</td>
+                        <td id="column-sum-4">0.00</td>
+                        <td id="column-sum-5">0.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let columnSums = [0, 0, 0, 0, 0, 0]; // 初始化各列累积数数组
+        let previousData = {}; // 存储前一个数据状态
+
+        function fetchData() {
+            fetch('/api/getAllMerchantsData')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('merchant-data-body');
+                    const refreshTime = document.getElementById('refresh-time');
+                    const columnSum1 = document.getElementById('column-sum-1');
+                    const columnSum2 = document.getElementById('column-sum-2');
+                    const columnSum3 = document.getElementById('column-sum-3');
+                    const columnSum4 = document.getElementById('column-sum-4');
+                    const columnSum5 = document.getElementById('column-sum-5');
+                    tbody.innerHTML = ''; // 清空现有数据
+                    columnSums = [0, 0, 0, 0, 0, 0]; // 重置各列累积数
+
+                    for (const accountId in data) {
+                        const merchant = data[accountId];
+                        const balanceData = merchant.balanceData;
+                        let isError = false;
+
+                        // Check if balanceData contains error code
+                        if (balanceData.code && balanceData.code === 401) {
+                            isError = true;
+                        }
+
+                        const tr = document.createElement('tr');
+                        const balance = parseFloat(balanceData.cash_balance) || 0;
+                        tr.innerHTML = `
+                            <td>${merchant.merchantName}</td>
+                            <td class="${isError ? 'error' : ''}">${balance.toFixed(2)}</td>
+                            <td class="${isError ? 'error' : ''}">${parseFloat(balanceData.in_transit_balance).toFixed(2) || '0.00'}</td>
+                            <td class="${isError ? 'error' : ''}">${parseFloat(balanceData.receivable_balance).toFixed(2) || '0.00'}</td>
+                            <td class="${isError ? 'error' : ''}">${parseFloat(balanceData.channel_payable_balance).toFixed(2) || '0.00'}</td>
+                            <td class="${isError ? 'error' : ''}">${parseFloat(balanceData.channel_settled_balance).toFixed(2) || '0.00'}</td>
+                        `;
+                        tbody.appendChild(tr);
+
+                        // Update column sums
+                        if (!isError) {
+                            columnSums[1] += balance;
+                            columnSums[2] += parseFloat(balanceData.in_transit_balance) || 0;
+                            columnSums[3] += parseFloat(balanceData.receivable_balance) || 0;
+                            columnSums[4] += parseFloat(balanceData.channel_payable_balance) || 0;
+                            columnSums[5] += parseFloat(balanceData.channel_settled_balance) || 0;
+                        }
+
+                        // Store current data for comparison in the next iteration
+                        previousData[accountId] = merchant;
+                    }
+
+                    // Update refresh time and column sum text
+                    const now = new Date();
+                    const formattedTime = now.toLocaleTimeString();
+                    refreshTime.textContent = `数据最后刷新时间：${formattedTime}`;
+                    columnSum1.textContent = columnSums[1].toFixed(2);
+                    columnSum2.textContent = columnSums[2].toFixed(2);
+                    columnSum3.textContent = columnSums[3].toFixed(2);
+                    columnSum4.textContent = columnSums[4].toFixed(2);
+                    columnSum5.textContent = columnSums[5].toFixed(2);
+                });
+        }
+
+        // 定时刷新数据
+        setInterval(fetchData, 60000); // 每分钟刷新一次
+
+        // 初始加载数据
+        fetchData();
+    </script>
 </body>
 </html>

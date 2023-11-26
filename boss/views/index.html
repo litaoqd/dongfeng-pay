@@ -208,7 +208,7 @@
 	    		<div>
 	    			<a href="#"  class="first-menu" onclick='loadMainContent("/main.html")'>
 		    			<span class="glyphicon glyphicon-home"></span>
-		    			<span class="first-title">控制面板</span>
+		    			<span class="first-title">监控面板</span>
 		    		</a>
 	    		</div>
 	    		<div>
@@ -337,6 +337,7 @@
 <script>
 	$(function() {
 		$(".second-menu").hide();
+		loadMainContent("/main.html");  // 自动加载 main.html
 	});
 	function loadMainContent(url) {
     	$(".main").load(url);
