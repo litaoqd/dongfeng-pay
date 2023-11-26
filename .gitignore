@@ -2,9 +2,10 @@
 boss/boss
 merchant/merchant
 shop/shop
-Agent/agent
-Logs/
+agent/agent
+logs/
 shop/static/qrcodes/
+shop/conf/app.conf
 
 # 其他常见忽略项
 *.log
@@ -16,7 +17,6 @@ shop/static/qrcodes/
 *.conf
 .DS_Store
 .idea
-app.conf
 
 # IDE和编辑器特定文件
 /.idea/
