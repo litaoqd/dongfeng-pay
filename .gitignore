@@ -15,6 +15,7 @@ shop/static/qrcodes/
 *.swp
 *.conf
 .DS_Store
+.idea
 
 # IDE和编辑器特定文件
 /.idea/
