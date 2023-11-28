@@ -4,13 +4,12 @@
     {{template "template/css.html"}}
 <style>
     .order-details {
-        background-color: #ffffff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        margin-top: 20px;
-        font-family: 'Arial', sans-serif;
+        border: 1px solid #ddd; /* 添加边框 */
+            background-color: #f9f9f9; /* 轻微的背景色 */
+            padding: 20px; /* 内边距 */
+            border-radius: 5px; /* 轻微的圆角 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+            margin: 10px; /* 外边距 */
     }
     .order-details table {
         width: 100%;
@@ -50,6 +49,108 @@
         margin-top: 20px;
         font-family: 'Arial', sans-serif;
     }
+    .card-body .d-flex {
+        display: flex;
+        justify-content: space-between; /* 两边对齐 */
+        align-items: start; /* 顶部对齐 */
+    }
+
+    #detailsButton {
+        margin-left: auto; 
+        /* 自动边距使按钮靠右 */
+    }
+
+    .status-succeeded {
+            background-color: #d4edda; /* 绿色背景 */
+            color: #155724; /* 深绿色文字 */
+        }
+        
+        .status-processing {
+            background-color: #fff3cd; /* 黄色背景 */
+            color: #856404; /* 深黄色文字 */
+        }
+        
+        .status-failed {
+            background-color: #f8d7da; /* 红色背景 */
+            color: #721c24; /* 深红色文字 */
+        }
+        
+        .status-default {
+            background-color: #f0f0f0; /* 默认背景颜色 */
+            color: #333; /* 默认文字颜色 */
+        }
+
+        #detailsModal {
+            position: fixed; /* 确保模态窗口固定在视口内 */
+            z-index: 1050;   /* Bootstrap 默认值，足够高以确保在顶层 */
+            top: 50%;
+            left: 50%;
+            height: 800px;
+            transform: translate(-50%, -50%);
+        }
+
+        .modal-dialog {
+            width: auto; /* 或者设定一个具体的宽度 */
+            max-width: 600px; /* 根据需要调整 */
+        }
+
+        /* 模态窗口头部布局样式 */
+        #detailsModal .modal-header {
+            display: flex; /* 使用 flex 布局 */
+            align-items: start; /* 元素顶部对齐 */
+            justify-content: space-between; /* 元素间隔开 */
+            background-color: #007bff; /* 背景色 */
+            color: white; /* 文字颜色 */
+            padding: 10px 20px; /* 内边距 */
+        }
+        
+        /* 标题样式 */
+        #detailsModal .modal-title {
+            flex-grow: 1; /* 让标题占据多余空间 */
+            text-align: center; /* 标题居中 */
+            font-family: 'Arial', sans-serif; /* 字体 */
+            font-size: 24px; /* 字体大小 */
+            font-weight: bold; /* 加粗 */
+            margin: 0; /* 移除默认外边距 */
+        }
+        
+        /* Logo 样式 */
+        #detailsModal .modal-logo {
+            width: 80px; /* Logo 宽度 */
+            height: auto; /* 高度自适应 */
+            position: absolute; /* 绝对定位 */
+            top: 10px; /* 距顶部距离 */
+            left: 20px; /* 距左侧距离 */
+        }
+
+        #detailsModal .modal-body {
+            padding: 20px; /* 内边距 */
+        }
+
+        #detailsModal table {
+            width: 100%; /* 表格宽度 */
+            border-collapse: collapse; /* 边框合并 */
+            margin-bottom: 20px; /* 底部边距 */
+        }
+        
+        #detailsModal th,
+        #detailsModal td {
+            padding: 10px; /* 单元格内边距 */
+            border: 1px solid #ddd; /* 单元格边框 */
+        }
+        
+        #detailsModal .modal-footer {
+            border-top: 1px solid #ddd; /* 底部边框 */
+        }
+
+        #detailsModal .modal-content {
+            background-color: white; /* 背景色 */
+            color: #333; /* 文字颜色 */
+            font-family: 'Arial', sans-serif; /* 字体 */
+            border-radius: 8px; /* 边框圆角 */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+        }
+        
 </style>
 
 
@@ -173,18 +274,18 @@
                                     <option value="collect">代收</option>
                                     <option value="disburse">代付</option>
                                 </select>
-                                
-                                                                
+                                                    
                                 <button onclick="searchOrder()" class="btn btn-primary" style="margin-left: 15px;">搜索</button>
-                                <!-- 在搜索按钮后添加生成回单按钮 -->
-                                <!--<button id="generateReceiptBtn" class="btn btn-secondary" style="margin-left: 15px;" disabled onclick="generateReceipt()">生成回单</button>-->
-
 
                             </div>
                                 <div class="card-body">
+                                    <button id="detailsButton" class="btn btn-primary" style="display: none;" onclick="showDetails()">
+                                        查看详情 <i class="fa fa-wrench"></i>
+                                    </button>   
                                     <div id="orderResult"></div>
                                 </div>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -194,19 +295,23 @@
 </div>
 
 <!-- 回单模板 -->
-<div id="receiptTemplate" style="display:none;">
-    <div class="receipt-container">
-        <div class="receipt-header">
-            <h2>付款回单</h2>
-        </div>
-        <div class="receipt-section">
-            <strong>订单号：</strong> <span id="receiptOrderId"></span><br>
-            <strong>金额：</strong> <span id="receiptAmount"></span><br>
-            <strong>付款日期：</strong> <span id="receiptDate"></span><br>
-            <!-- 添加更多需要的字段 -->
-        </div>
-        <div class="receipt-footer">
-            <p>感谢您使用我们的服务！</p>
+<div class="modal" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <img src="../../static/img/logo.png" alt="Logo" class="modal-logo">
+                <h5 class="modal-title" id="detailsModalLabel">Transaction Receipt</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-content">
+                <!-- 交易详情数据将显示在这里 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="downloadPdf()">下载 PDF</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
         </div>
     </div>
 </div>
@@ -216,7 +321,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@2/dist/purify.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
 
 <script>
 function searchOrder() {
@@ -257,9 +363,11 @@ function searchOrder() {
 
 function displayOrderData(orderData,transactionType) {
     // 检查是否存在订单号
-    if (!orderData.ref_trade_id) {
+    if (!orderData || !orderData.ref_trade_id) {
         document.getElementById('orderResult').innerHTML = '<p class="order-not-found">未找到订单</p>';
+        document.getElementById('detailsButton').style.display = 'none'; // 隐藏按钮
         return;
+
     }
 
     // 检查 customer 字段是否存在并且包含所需的属性
@@ -340,7 +448,62 @@ function displayOrderData(orderData,transactionType) {
     document.getElementById('orderResult').innerHTML += hiddenDetails;
     console.log("Hidden Order ID: " + document.getElementById('hiddenOrderId').innerText);
     console.log("Hidden Order Amount: " + document.getElementById('hiddenOrderAmount').innerText);
+    
+    // 显示“查看详情”按钮并传递orderData
+    var detailsButton = document.getElementById('detailsButton');
+    if (detailsButton) {
+        detailsButton.style.display = 'block';
+        detailsButton.onclick = function() {
+            showDetails(orderData,transactionType);
+        };
+    }
 }
+
+function showDetails(orderData,transactionType) {
+    // 填充模态窗口内容
+    // var modalContentHtml = ``;
+    // document.getElementById('modal-content').innerHTML = modalContentHtml;
+
+    // 显示模态窗口
+    // $('#detailsModal').modal('show');
+    // var statusClass = getStatusClass(status); // 获取状态对应的样式类
+    if (!orderData) {
+        console.error('No order data provided');
+        return;
+    }
+
+    var statusClass = getStatusClass(orderData.status); // 获取状态对应的样式类
+    // 代付订单的HTML结构
+    orderDetailsHtml1 = `
+        <div class="order-details">
+            <p>Sender name :  <br> <strong>OnePay</strong> </p>
+            <p>Amount : <br> <strong> ${orderData.amount} ${orderData.currency}  </strong> </p>
+            <p>Customer order number : <br> <strong> ${orderData.id} </strong> </p>
+            <p>Platform order number : </strong> <br> <strong><span class="platform-order-number"> ${orderData.ref_trade_id} </span></strong> </p>
+            <p>Bank Account Name: <br> <strong> ${orderData.bank_account_name}</strong> </p>
+            <p>Bank Account No: <br> <strong> ${orderData.bank_account_no}</strong> </p>
+            <p>Transaction Time: <br> <strong> ${new Date(parseInt(orderData.trans_at)).toLocaleString()}</strong> </p>
+            <p>Status:<br> <strong class="${statusClass}"> ${orderData.status}</strong> </p>
+        </div>
+    `; 
+   
+    // 更新模态窗口中的内容
+    document.getElementById('modal-content').innerHTML = orderDetailsHtml1;
+    $('#detailsModal').modal('show');
+}
+
+function getStatusClass(status) {
+            switch (status) {
+                case 'succeeded':
+                    return 'status-succeeded';
+                case 'processing':
+                    return 'status-processing';
+                case 'failed':
+                    return 'status-failed';
+                default:
+                    return 'status-default';
+            }
+        }
 
 function handleKeyPress(event) {
     if (event.keyCode === 13) { // 13 是回车键的键码
@@ -348,60 +511,107 @@ function handleKeyPress(event) {
     }
 }
 
-function generateReceipt() {
-    var transactionType = document.getElementById('transactionType').value;
-    var orderId = document.getElementById('hiddenOrderId').innerText;
-    var amount = document.getElementById('hiddenOrderAmount').innerText;
-    var date = new Date().toLocaleDateString();
+function downloadPdf() {
+    const modalContent = document.getElementById('modal-content');
+    if (!modalContent) {
+        console.error('Modal content not found');
+        return;
+    }
 
-    // 获取回单模板
-    var receiptTemplate = document.getElementById('receiptTemplate').innerHTML;
+    // 获取平台订单号
+    const platformOrderNumberElement = modalContent.querySelector('.platform-order-number');
+    if (!platformOrderNumberElement) {
+        console.error('Platform order number element not found');
+        return;
+    }
+    const platformOrderNumber = platformOrderNumberElement.innerText;
+    console.log('Platform Order Number:', platformOrderNumber);
 
-    // 根据交易类型动态生成回单内容
-    var receiptContent = `
-        <strong>订单号：</strong> ${orderId}<br>
-        <strong>金额：</strong> ${amount}<br>
-        <strong>付款日期：</strong> ${date}<br>
-        <!-- 添加其他所需信息 -->
-    `;
+    // 使用 html2canvas 转换模态内容为图像
+    html2canvas(modalContent).then(canvas => {
+        console.log('Canvas created from modal content');
+        const imgData = canvas.toDataURL('image/png');
 
-    // 创建一个新的 div 元素来显示回单
-    var receiptDiv = document.createElement('div');
-    receiptDiv.className = 'receipt-container';
-    
-    receiptDiv.innerHTML = receiptTemplate;
-    receiptDiv.querySelector('.receipt-section').innerHTML = receiptContent; // 设置回单内容
+        // 创建 PDF 文档
+        const pdf = new jspdf.jsPDF({
+            orientation: "portrait",
+            unit: "pt",
+            format: "a4"
+        });
 
-    // 添加下载和返回按钮
-    var buttonsHtml = `
-        <button onclick="downloadReceipt()" class="btn btn-primary">下载回单</button>
-        <button onclick="closeReceipt()" class="btn btn-secondary">返回</button>
-    `;
-    receiptDiv.querySelector('.receipt-footer').innerHTML += buttonsHtml;
+        // 加载 Logo 图像
+        const logoImg = new Image();
+        logoImg.src = '../../static/img/logo.png'; // 确保这是正确的路径
+        logoImg.onload = () => {
+            console.log('Logo image loaded');
+                    // 计算保持长宽比的Logo尺寸
+                    const logoMaxWidth = 100; // Logo的最大宽度
+                    const logoAspectRatio = logoImg.width / logoImg.height;
+                    const logoWidth = logoMaxWidth;
+                    const logoHeight = logoWidth / logoAspectRatio;
+        
+                    // 绘制Logo
+                    const margin = 30;
+                    pdf.addImage(logoImg, 'PNG', margin, margin, logoWidth, logoHeight);
+        
+                    // 设置标题栏的高度和边距
+                    const titleBarHeight = 60;
+                    const title = "Transaction Receipt";
+                    const titleFontSize = 36;
+        
+                    // 设置常规文本的字体大小
+                    const textFontSize = 10;
+                    pdf.setFontSize(textFontSize);
+                    pdf.setFont("helvetica");
+        
+                    // 计算图像尺寸和位置
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    const imgProps = pdf.getImageProperties(imgData);
+                    const imgWidth = pdfWidth - 2 * margin + 40;
+                    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+        
+                    // 计算标题和图像的整体高度
+                    const totalContentHeight = titleBarHeight + imgHeight;
+        
+                    // 计算标题和图像在页面中的垂直起始位置以居中显示
+                    const contentStartY = (pdfHeight - totalContentHeight) / 2 + 30;
+        
+                    // 添加标题
+                    pdf.setFontSize(titleFontSize);
+                    pdf.text(title, pdfWidth / 2, contentStartY + (titleBarHeight / 2), { align: "center" });
+        
+                    // // 在标题栏下方添加横线
+                    const lineY = contentStartY + titleBarHeight;
+        
+                    // 添加图像
+                    const imageStartY = lineY - 15;
+                    pdf.addImage(imgData, 'PNG', margin-20, imageStartY, imgWidth, imgHeight);
 
-    // 添加样式以确保回单是可见的
-    applyReceiptStyles(receiptDiv);
+                    // 在标题栏下方添加横线
+                    pdf.line(margin, lineY, pdfWidth - margin, lineY ); // 添加分隔线
+               
+                    // 页脚信息
+                    const footerY = imageStartY + imgHeight -10;
+                    // pdf.text("Company Address: 123 Street, City, Country", margin, footerY);
+                    pdf.line(margin, footerY, pdfWidth - margin, footerY); // 分隔线
+                    // pdf.text("Contact Us: (123) 456-7890 | info@company.com", margin, footerY + 15);
+        
+                    // 保存 PDF
+            // 保存 PDF
+            pdf.save(`${platformOrderNumber}.pdf`);
+            console.log('PDF generated and saved');
+        };
 
-    document.body.appendChild(receiptDiv);
-}
-
-
-function downloadReceipt() {
-    var receiptDiv = document.querySelector('.receipt-container');
-
-    // 使用 jsPDF 创建 PDF 文档
-    var doc = new jspdf.jsPDF();
-
-    // 将 HTML 内容添加到 PDF 文档中
-    doc.html(receiptDiv.innerHTML, {
-        callback: function (doc) {
-            // 保存 PDF 文档
-            doc.save('receipt.pdf');
-        },
-        x: 10,
-        y: 10
+        logoImg.onerror = () => {
+            console.error('Error loading logo image');
+        };
+    }).catch(error => {
+        console.error('Error generating canvas:', error);
     });
 }
+
+
 
 // 关闭回单显示
 function closeReceipt() {
